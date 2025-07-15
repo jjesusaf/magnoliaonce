@@ -15,9 +15,7 @@ export default function Home() {
         <Logo />
         <Art />
       </div>
-      <div className="flex items-center justify-center gap-6">
-        <Contact />
-      </div>
+      <Contact />
     </div>
   );
 }
