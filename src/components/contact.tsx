@@ -1,13 +1,10 @@
 "use client";
-import { FaInstagram } from "react-icons/fa"; 
-import Image from "next/image";
 import InstaLottie from "@/lottie/insta";
 
 export default function Contact() {
-  /* ⚙️  CONFIG */
-  const phoneNumber = "5518322693";     // sin espacios
+  const phoneNumber = "5518322693";     
   const waMessage = encodeURIComponent(
-    "¡Hola! Vengo de la web y quiero más información sobre Magnolia Once."
+    "Hola! ¿Me puedes das más información sobre los arreglos florales? 💐"
   );
   const waLink = `https://wa.me/52${phoneNumber}?text=${waMessage}`;
 
@@ -15,7 +12,6 @@ export default function Contact() {
   const igAppLink = `instagram://user?username=${igUser}`;
   const igWebLink = `https://instagram.com/${igUser}`;
 
-  /* Deep‑link a la app de IG con fallback web */
   const handleIgClick = (e: React.MouseEvent<HTMLAnchorElement>) => {
     e.preventDefault();
     window.location.href = igAppLink;
@@ -26,7 +22,6 @@ export default function Contact() {
 
   return (
     <div className="flex items-center justify-between gap-4">
-      {/* WhatsApp */}
       <a
         href={waLink}
         target="_blank"
@@ -37,10 +32,8 @@ export default function Contact() {
         TEL: 55 1832 2693
       </a>
 
-      {/* Separador */}
       <div className="h-6 md:h-8 w-px bg-black" />
 
-      {/* Instagram */}
       <a
         href={igWebLink}
         onClick={handleIgClick}
