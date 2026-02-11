@@ -1,0 +1,14 @@
+{
+  "hero": {
+    "description1": "Magnolia Once es un estudio floral contemporáneo y tienda. Desde su lanzamiento, hemos desafiado las reglas tradicionales, adoptando colores audaces, texturas inesperadas y expresión artística para crear un diseño floral moderno y distintivo.",
+    "description2": "Desde instalaciones escultóricas hasta ramos atados a mano, nuestro trabajo aporta emoción y vanguardia a cualquier contexto.",
+    "imageAlt": "Arreglo floral"
+  },
+  "nav": {
+    "shop": "TIENDA",
+    "about": "NOSOTROS",
+    "clients": "CLIENTES",
+    "services": "SERVICIOS",
+    "contact": "CONTACTO"
+  }
+}

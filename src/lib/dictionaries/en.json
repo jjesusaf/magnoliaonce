@@ -1,0 +1,14 @@
+{
+  "hero": {
+    "description1": "Magnolia Once is a contemporary floral studio and shop. Since launching, we have challenged traditional rules, embracing bold colours, unexpected textures, and artistic expression to create distinctive, modern floral design.",
+    "description2": "From sculptural installations to hand-tied bouquets, our work brings emotion and edge to any context.",
+    "imageAlt": "Floral arrangement"
+  },
+  "nav": {
+    "shop": "SHOP",
+    "about": "ABOUT",
+    "clients": "CLIENTS",
+    "services": "SERVICES",
+    "contact": "CONTACT"
+  }
+}
