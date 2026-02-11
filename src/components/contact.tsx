@@ -2,7 +2,7 @@
 import InstaLottie from "@/lottie/insta";
 
 export default function Contact() {
-  const phoneNumber = "5518322693";     
+  const phoneNumber = "5518322693";
   const waMessage = encodeURIComponent(
     "Hola! ¿Me puedes das más información sobre los arreglos florales? 💐"
   );
