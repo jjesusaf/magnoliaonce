@@ -5,10 +5,35 @@
     "imageAlt": "Arreglo floral"
   },
   "nav": {
+    "studio": "ESTUDIO",
     "shop": "TIENDA",
+    "florals": "FLORALES",
+    "workshops": "TALLERES",
+    "goods": "PRODUCTOS",
     "about": "NOSOTROS",
     "clients": "CLIENTES",
     "services": "SERVICIOS",
     "contact": "CONTACTO"
+  },
+  "shopHero": {
+    "arrangements": "ARREGLOS",
+    "bouquets": "RAMOS",
+    "events": "EVENTOS",
+    "imageAlt": "Arreglo floral"
+  },
+  "shop": {
+    "from": "Desde",
+    "addToCart": "Agregar",
+    "soldOut": "Agotado",
+    "selectVariant": "Selecciona tu arreglo",
+    "description": "Descripción",
+    "backToCollection": "Volver a colección"
+  },
+  "footer": {
+    "contact": "CONTACTO",
+    "faq": "FAQ",
+    "privacy": "POLÍTICA DE PRIVACIDAD",
+    "terms": "TÉRMINOS DE SERVICIO",
+    "copyright": "© 2026 Magnolia Once"
   }
 }

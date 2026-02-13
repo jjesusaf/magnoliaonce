@@ -5,10 +5,35 @@
     "imageAlt": "Floral arrangement"
   },
   "nav": {
+    "studio": "STUDIO",
     "shop": "SHOP",
+    "florals": "FLORALS",
+    "workshops": "WORKSHOPS",
+    "goods": "GOODS",
     "about": "ABOUT",
     "clients": "CLIENTS",
     "services": "SERVICES",
     "contact": "CONTACT"
+  },
+  "shopHero": {
+    "arrangements": "ARRANGEMENTS",
+    "bouquets": "BOUQUETS",
+    "events": "EVENTS",
+    "imageAlt": "Floral arrangement"
+  },
+  "shop": {
+    "from": "From",
+    "addToCart": "Add to cart",
+    "soldOut": "Sold out",
+    "selectVariant": "Select your arrangement",
+    "description": "Description",
+    "backToCollection": "Back to collection"
+  },
+  "footer": {
+    "contact": "CONTACT",
+    "faq": "FAQ",
+    "privacy": "PRIVACY POLICY",
+    "terms": "TERMS OF SERVICE",
+    "copyright": "© 2026 Magnolia Once"
   }
 }
