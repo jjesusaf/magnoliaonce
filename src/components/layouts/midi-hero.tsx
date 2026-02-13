@@ -11,7 +11,11 @@ type Dictionary = {
     imageAlt: string;
   };
   nav: {
+    studio: string;
     shop: string;
+    florals: string;
+    workshops: string;
+    goods: string;
     about: string;
     clients: string;
     services: string;
@@ -31,11 +35,11 @@ export function MidiHero({ dict, lang }: Props) {
   const heroImageUrl = getImageUrl(BUCKET, HERO_IMAGE);
 
   const navLinks = [
-    { label: dict.nav.shop, href: `/${lang}/shop` },
-    { label: dict.nav.about, href: `/${lang}/about` },
-    { label: dict.nav.clients, href: `/${lang}/clients` },
-    { label: dict.nav.services, href: `/${lang}/services` },
-    { label: dict.nav.contact, href: `/${lang}/contact` },
+    { label: dict.nav.shop, href: `/${lang}/shop`, enabled: true },
+    { label: dict.nav.about, href: `/${lang}/about`, enabled: false },
+    { label: dict.nav.clients, href: `/${lang}/clients`, enabled: false },
+    { label: dict.nav.services, href: `/${lang}/services`, enabled: false },
+    { label: dict.nav.contact, href: `/${lang}/contact`, enabled: false },
   ];
 
   return (
@@ -76,12 +80,18 @@ export function MidiHero({ dict, lang }: Props) {
           <ul className="menu p-0 gap-0">
             {navLinks.map((link) => (
               <li key={link.href}>
-                <Link
-                  href={link.href}
-                  className="link link-hover text-primary-content/60 hover:text-primary-content text-xl md:text-3xl lg:text-4xl uppercase tracking-tight px-0 py-0.5 leading-tight bg-transparent"
-                >
-                  {link.label}
-                </Link>
+                {link.enabled ? (
+                  <Link
+                    href={link.href}
+                    className="link link-hover text-primary-content/60 hover:text-primary-content text-xl md:text-3xl lg:text-4xl uppercase tracking-tight px-0 py-0.5 leading-tight bg-transparent"
+                  >
+                    {link.label}
+                  </Link>
+                ) : (
+                  <span className="text-primary-content/30 text-xl md:text-3xl lg:text-4xl uppercase tracking-tight px-0 py-0.5 leading-tight cursor-default">
+                    {link.label}
+                  </span>
+                )}
               </li>
             ))}
           </ul>
