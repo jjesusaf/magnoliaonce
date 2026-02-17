@@ -29,6 +29,15 @@
     "description": "Description",
     "backToCollection": "Back to collection"
   },
+  "cart": {
+    "title": "Cart",
+    "empty": "Your cart is empty",
+    "remove": "Remove",
+    "total": "Total",
+    "checkout": "Checkout",
+    "added": "Added",
+    "continueShopping": "Continue shopping"
+  },
   "footer": {
     "contact": "CONTACT",
     "faq": "FAQ",

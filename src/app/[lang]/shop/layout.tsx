@@ -13,7 +13,7 @@ export default async function ShopLayout({
   const dict = await getDictionary(lang as Locale);
 
   return (
-    <ShopNavbar lang={lang} nav={dict.nav}>
+    <ShopNavbar lang={lang} nav={dict.nav} cartDict={dict.cart}>
       {children}
     </ShopNavbar>
   );

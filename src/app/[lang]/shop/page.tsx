@@ -14,7 +14,7 @@ export default async function ShopPage({
   return (
     <>
       {/* Desktop: fit viewport no scroll / Mobile: scroll + padding for fixed footer */}
-      <main className="pt-16 pb-28 lg:pb-0 lg:h-dvh lg:overflow-hidden flex flex-col">
+      <main className="pt-16 pb-28 lg:pb-0 min-h-dvh flex flex-col">
         <ShopHero lang={lang} />
         <ShopFooter lang={lang} dict={dict.footer} />
       </main>

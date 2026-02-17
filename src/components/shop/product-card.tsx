@@ -21,7 +21,7 @@ type Props = {
 export function ProductCard({ product, categorySlug, lang, fromLabel }: Props) {
   const name = localized(product, "name", lang);
   const image = product.product_images[0];
-  const imageUrl = image ? getImageUrl(BUCKET, image.storage_path, { width: 600, height: 800, resize: "cover" }) : null;
+  const imageUrl = image ? getImageUrl(BUCKET, image.storage_path, { width: 600, height: 600, resize: "cover" }) : null;
   const alt = image ? localized(image, "alt", lang) || name : name;
 
   // Filter variants by lang currency and find the cheapest
@@ -36,13 +36,13 @@ export function ProductCard({ product, categorySlug, lang, fromLabel }: Props) {
       href={`/${lang}/shop/${categorySlug}/${product.slug}`}
       className="group flex flex-col"
     >
-      <div className="aspect-3/4 w-full overflow-hidden bg-base-200">
+      <div className="aspect-square w-full overflow-hidden bg-base-200">
         {imageUrl && (
           <Image
             src={imageUrl}
             alt={alt}
             width={600}
-            height={800}
+            height={600}
             className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
           />
         )}

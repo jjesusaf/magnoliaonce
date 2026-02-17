@@ -29,7 +29,7 @@ type Props = {
 };
 
 const BUCKET = "magnolia";
-const HERO_IMAGE = "hero/IMG_9196.jpeg";
+const HERO_IMAGE = "hero/IMG_9534.jpeg";
 
 export function MidiHero({ dict, lang }: Props) {
   const heroImageUrl = getImageUrl(BUCKET, HERO_IMAGE);
@@ -51,25 +51,25 @@ export function MidiHero({ dict, lang }: Props) {
 
       {/* Main content area */}
       <div className="flex-1 flex flex-col justify-between px-5 pb-5 md:px-10 md:pb-10 relative">
-        {/* Description text — more room on mobile */}
-        <div className="max-w-[85%] md:max-w-lg lg:max-w-xl xl:max-w-2xl mt-2 md:mt-4">
-          <p className="text-primary-content text-base md:text-lg lg:text-xl font-bold uppercase leading-snug tracking-tight">
+        {/* Description text */}
+        <div className="max-w-[70%] sm:max-w-[75%] md:max-w-lg lg:max-w-xl xl:max-w-2xl mt-2 md:mt-4">
+          <p className="text-primary-content text-sm sm:text-base md:text-lg lg:text-xl font-bold uppercase leading-snug tracking-tight">
             {dict.hero.description1}
           </p>
-          <p className="text-primary-content text-base md:text-lg lg:text-xl font-bold uppercase leading-snug tracking-tight mt-3 md:mt-4">
+          <p className="text-primary-content text-sm sm:text-base md:text-lg lg:text-xl font-bold uppercase leading-snug tracking-tight mt-3 md:mt-4">
             {dict.hero.description2}
           </p>
         </div>
 
-        {/* Flower image — positioned right, vertically centered on mobile */}
+        {/* Flower image — flows naturally on mobile, absolute on md+ */}
         {heroImageUrl && (
-          <div className="absolute right-4 top-1/2 -translate-y-1/2 w-36 md:right-[5%] md:top-auto md:bottom-[10%] md:translate-y-0 md:w-52 lg:w-64 xl:w-72">
+          <div className="self-end -my-4 md:my-0 md:absolute md:right-[5%] md:bottom-[10%] md:w-52 lg:w-64 xl:w-72">
             <Image
               src={heroImageUrl}
               alt={dict.hero.imageAlt}
               width={400}
               height={500}
-              className="object-cover w-full h-auto"
+              className="object-cover w-28 sm:w-36 md:w-full h-auto"
               priority
             />
           </div>

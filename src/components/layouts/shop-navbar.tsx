@@ -7,6 +7,8 @@ import { User, ShoppingBag, Menu } from "lucide-react";
 import { useRef } from "react";
 import type { Locale } from "@/lib/i18n";
 import { ThemeToggle } from "@/components/theme-toggle";
+import { useCart } from "@/lib/cart-context";
+import { CartDrawer } from "@/components/shop/cart-drawer";
 
 const DRAWER_ID = "shop-drawer";
 
@@ -23,17 +25,28 @@ type NavDict = {
   goods: string;
 };
 
+type CartDict = {
+  title: string;
+  empty: string;
+  remove: string;
+  total: string;
+  checkout: string;
+  continueShopping: string;
+};
+
 type Props = {
   lang: string;
   nav: NavDict;
+  cartDict: CartDict;
   children: React.ReactNode;
 };
 
-export function ShopNavbar({ lang, nav, children }: Props) {
+export function ShopNavbar({ lang, nav, cartDict, children }: Props) {
   const pathname = usePathname();
   const otherLang = lang === "es" ? "en" : "es";
   const switchedPath = pathname.replace(`/${lang}`, `/${otherLang}`);
   const drawerRef = useRef<HTMLInputElement>(null);
+  const { totalItems, toggleCart } = useCart();
 
   const links = [
     { label: nav.studio, href: `/${lang}/studio`, enabled: false },
@@ -62,7 +75,7 @@ export function ShopNavbar({ lang, nav, children }: Props) {
         <div className="navbar fixed top-0 left-0 right-0 z-40 bg-base-100/80 backdrop-blur-xl border-b border-base-200 px-6 py-3 lg:px-10 lg:py-4 justify-evenly">
           {/* Logo */}
           <div className="navbar-start items-center">
-            <Link href={`/${lang}`} className="shrink-0 flex items-center">
+            <Link href={`/${lang}/shop`} className="shrink-0 flex items-center">
               {/* Mobile: mini logo */}
               <div className="logo-stack grid lg:hidden">
                 <Image
@@ -184,8 +197,17 @@ export function ShopNavbar({ lang, nav, children }: Props) {
             </button>
 
             {/* Cart */}
-            <button className="btn btn-ghost btn-circle" aria-label="Cart">
+            <button
+              className="btn btn-ghost btn-circle relative"
+              aria-label="Cart"
+              onClick={toggleCart}
+            >
               <ShoppingBag className="h-5 w-5 stroke-[1.5]" />
+              {totalItems > 0 && (
+                <span className="badge badge-primary badge-xs absolute -top-0.5 -right-0.5 text-[10px] min-w-[18px] h-[18px] p-0 flex items-center justify-center">
+                  {totalItems}
+                </span>
+              )}
             </button>
 
             {/* Hamburger — mobile */}
@@ -267,8 +289,17 @@ export function ShopNavbar({ lang, nav, children }: Props) {
               <button className="btn btn-ghost btn-circle" aria-label="Account">
                 <User className="h-5 w-5 stroke-[1.5]" />
               </button>
-              <button className="btn btn-ghost btn-circle" aria-label="Cart">
+              <button
+                className="btn btn-ghost btn-circle relative"
+                aria-label="Cart"
+                onClick={() => { closeDrawer(); toggleCart(); }}
+              >
                 <ShoppingBag className="h-5 w-5 stroke-[1.5]" />
+                {totalItems > 0 && (
+                  <span className="badge badge-primary badge-xs absolute -top-0.5 -right-0.5 text-[10px] min-w-[18px] h-[18px] p-0 flex items-center justify-center">
+                    {totalItems}
+                  </span>
+                )}
               </button>
             </div>
             <div className="flex items-center gap-1">
@@ -284,6 +315,9 @@ export function ShopNavbar({ lang, nav, children }: Props) {
           </div>
         </div>
       </div>
+
+      {/* Cart drawer */}
+      <CartDrawer lang={lang} dict={cartDict} />
     </div>
   );
 }

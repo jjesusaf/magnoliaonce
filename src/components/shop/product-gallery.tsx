@@ -19,7 +19,7 @@ export function ProductGallery({ images }: Props) {
 
   if (images.length === 0) {
     return (
-      <div className="aspect-[3/4] w-full bg-base-200 flex items-center justify-center">
+      <div className="aspect-square w-full bg-base-200 flex items-center justify-center">
         <span className="text-base-content/40">No image</span>
       </div>
     );
@@ -30,12 +30,12 @@ export function ProductGallery({ images }: Props) {
   return (
     <div className="flex flex-col gap-3">
       {/* Main image */}
-      <div className="aspect-3/4 w-full overflow-hidden bg-base-200">
+      <div className="aspect-square w-full overflow-hidden bg-base-200">
         <Image
           src={main.url}
           alt={main.alt}
           width={800}
-          height={1067}
+          height={800}
           className="h-full w-full object-cover"
           priority
         />
@@ -48,7 +48,7 @@ export function ProductGallery({ images }: Props) {
             <button
               key={img.id}
               onClick={() => setSelected(i)}
-              className={`shrink-0 w-16 h-20 md:w-20 md:h-26 overflow-hidden border-2 transition-colors ${
+              className={`shrink-0 w-16 h-16 md:w-20 md:h-20 overflow-hidden border-2 transition-colors ${
                 i === selected
                   ? "border-base-content"
                   : "border-transparent hover:border-base-content/30"
@@ -58,7 +58,7 @@ export function ProductGallery({ images }: Props) {
                 src={img.thumbUrl}
                 alt={img.alt}
                 width={200}
-                height={267}
+                height={200}
                 className="h-full w-full object-cover"
               />
             </button>

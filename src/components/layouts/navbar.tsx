@@ -56,7 +56,7 @@ export default function FloristNavbar() {
         <div className="flex justify-between items-center h-16">
           {/* Logo */}
 
-          <div className="flex items-center space-x-2 flex-shrink-0">
+          <div className="flex items-center space-x-2 shrink-0">
             <Image
               src="/images/logo.svg"
               alt="magnoliaonce"
@@ -74,7 +74,7 @@ export default function FloristNavbar() {
                   className="relative px-4 py-2 text-emerald-700 hover:text-rose-600 transition-all duration-200 hover:bg-rose-50/50 rounded-lg group cursor-pointer"
                 >
                   {item.name}
-                  <div className="absolute bottom-0 left-1/2 w-0 h-0.5 bg-gradient-to-r from-rose-400 to-pink-500 transition-all duration-300 group-hover:w-full group-hover:left-0"></div>
+                  <div className="absolute bottom-0 left-1/2 w-0 h-0.5 bg-linear-to-r from-rose-400 to-pink-500 transition-all duration-300 group-hover:w-full group-hover:left-0"></div>
                 </Button>
               </Link>
             ))}
@@ -118,7 +118,7 @@ export default function FloristNavbar() {
               className="relative hover:bg-rose-50/50 rounded-xl hidden sm:flex"
             >
               <Heart className="w-5 h-5 text-rose-500" />
-              <Badge className="absolute -top-1 -right-1 w-5 h-5 p-0 bg-gradient-to-r from-rose-400 to-pink-500 text-white text-xs flex items-center justify-center">
+              <Badge className="absolute -top-1 -right-1 w-5 h-5 p-0 bg-linear-to-r from-rose-400 to-pink-500 text-white text-xs flex items-center justify-center">
                 2
               </Badge>
             </Button>
@@ -130,7 +130,7 @@ export default function FloristNavbar() {
               className="relative hover:bg-rose-50/50 rounded-xl"
             >
               <ShoppingBag className="w-5 h-5 text-emerald-600" />
-              <Badge className="absolute -top-1 -right-1 w-5 h-5 p-0 bg-gradient-to-r from-emerald-400 to-green-500 text-white text-xs flex items-center justify-center">
+              <Badge className="absolute -top-1 -right-1 w-5 h-5 p-0 bg-linear-to-r from-emerald-400 to-green-500 text-white text-xs flex items-center justify-center">
                 3
               </Badge>
             </Button>
@@ -142,7 +142,7 @@ export default function FloristNavbar() {
                   variant="ghost"
                   className="flex items-center space-x-2 hover:bg-rose-50/50 rounded-xl px-2 sm:px-3"
                 >
-                  <div className="w-7 h-7 sm:w-8 sm:h-8 bg-gradient-to-r from-rose-400 to-pink-500 rounded-full flex items-center justify-center shadow-sm">
+                  <div className="w-7 h-7 sm:w-8 sm:h-8 bg-linear-to-r from-rose-400 to-pink-500 rounded-full flex items-center justify-center shadow-sm">
                     <User className="w-3 h-3 sm:w-4 sm:h-4 text-white" />
                   </div>
                   <ChevronDown className="w-4 h-4 text-emerald-600 hidden sm:block" />
@@ -165,7 +165,7 @@ export default function FloristNavbar() {
             </DropdownMenu>
 
             {/* CTA Button */}
-            <Button className="hidden md:flex bg-gradient-to-r from-rose-500 to-pink-600 hover:from-rose-600 hover:to-pink-700 text-white px-4 lg:px-6 py-2 rounded-xl shadow-lg shadow-rose-500/25 transition-all duration-200 hover:shadow-xl hover:shadow-rose-500/30 hover:scale-105 text-sm">
+            <Button className="hidden md:flex bg-linear-to-r from-rose-500 to-pink-600 hover:from-rose-600 hover:to-pink-700 text-white px-4 lg:px-6 py-2 rounded-xl shadow-lg shadow-rose-500/25 transition-all duration-200 hover:shadow-xl hover:shadow-rose-500/30 hover:scale-105 text-sm">
               Pedir Ahora
             </Button>
 
@@ -240,7 +240,7 @@ export default function FloristNavbar() {
               >
                 <Heart className="w-4 h-4 mr-3" />
                 Favoritos
-                <Badge className="ml-auto bg-gradient-to-r from-rose-400 to-pink-500 text-white">
+                <Badge className="ml-auto bg-linear-to-r from-rose-400 to-pink-500 text-white">
                   2
                 </Badge>
               </Button>
@@ -248,7 +248,7 @@ export default function FloristNavbar() {
 
             {/* Mobile CTA */}
             <Button
-              className="w-full bg-gradient-to-r from-rose-500 to-pink-600 hover:from-rose-600 hover:to-pink-700 text-white rounded-xl shadow-lg shadow-rose-500/25 md:hidden"
+              className="w-full bg-linear-to-r from-rose-500 to-pink-600 hover:from-rose-600 hover:to-pink-700 text-white rounded-xl shadow-lg shadow-rose-500/25 md:hidden"
               onClick={() => setIsOpen(false)}
             >
               Pedir Ahora

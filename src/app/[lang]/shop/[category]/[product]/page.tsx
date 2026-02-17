@@ -46,8 +46,8 @@ export default async function ProductPage({ params }: Props) {
   // Build gallery images with URLs
   const galleryImages = (product.product_images ?? []).map((img) => ({
     id: img.id,
-    url: getImageUrl(BUCKET, img.storage_path, { width: 800, height: 1067, resize: "cover" }) ?? "",
-    thumbUrl: getImageUrl(BUCKET, img.storage_path, { width: 200, height: 267, resize: "cover" }) ?? "",
+    url: getImageUrl(BUCKET, img.storage_path, { width: 800, height: 800, resize: "cover" }) ?? "",
+    thumbUrl: getImageUrl(BUCKET, img.storage_path, { width: 200, height: 200, resize: "cover" }) ?? "",
     alt: localized(img, "alt", lang) || productName,
   }));
 
@@ -82,12 +82,12 @@ export default async function ProductPage({ params }: Props) {
         </div>
 
         {/* Product layout */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-8 lg:gap-12">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-8 lg:gap-16 max-w-6xl mx-auto">
           {/* Left: Gallery */}
           <ProductGallery images={galleryImages} />
 
           {/* Right: Details */}
-          <div className="flex flex-col gap-6">
+          <div className="flex flex-col gap-6 md:sticky md:top-24 md:self-start">
             <h1 className="text-2xl lg:text-3xl tracking-widest uppercase">
               {productName}
             </h1>
@@ -107,6 +107,11 @@ export default async function ProductPage({ params }: Props) {
               variants={product.product_variants ?? []}
               lang={lang}
               dict={dict.shop}
+              addedLabel={dict.cart.added}
+              productId={product.id}
+              productName={productName}
+              imageUrl={galleryImages[0]?.url ?? ""}
+              categorySlug={catSlug}
             />
 
             <Link
