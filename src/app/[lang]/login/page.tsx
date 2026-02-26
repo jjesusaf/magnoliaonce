@@ -1,6 +1,6 @@
 "use client";
 
-import { use, Suspense } from "react";
+import { use, Suspense, useState, useEffect, useCallback } from "react";
 import { createClient } from "@/lib/supabase/client";
 import { useSearchParams, useRouter } from "next/navigation";
 import Image from "next/image";
@@ -13,6 +13,10 @@ import {
   Shield,
   FileText,
   ChevronRight,
+  Ticket,
+  Copy,
+  Check,
+  LayoutDashboard,
 } from "lucide-react";
 import { useAuth } from "@/lib/auth-context";
 
@@ -34,11 +38,125 @@ function getGreeting(isEs: boolean): string {
   return isEs ? "Buenas noches" : "Good evening";
 }
 
+function generateCouponCode(): string {
+  const chars = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789";
+  let code = "MAGNOLIA-";
+  for (let i = 0; i < 6; i++) {
+    code += chars[Math.floor(Math.random() * chars.length)];
+  }
+  return code;
+}
+
 const PROVIDER_LABELS: Record<string, string> = {
   google: "Google",
   apple: "Apple",
   facebook: "Facebook",
 };
+
+/* ─── Coupon card ──────────────────────────────────────────── */
+
+function CouponCard({
+  code,
+  discount,
+  isRedeemed,
+  expiresAt,
+  isEs,
+}: {
+  code: string;
+  discount: number;
+  isRedeemed: boolean;
+  expiresAt: string;
+  isEs: boolean;
+}) {
+  const [copied, setCopied] = useState(false);
+  const expired = new Date(expiresAt) < new Date();
+  const inactive = isRedeemed || expired;
+
+  const expiryLabel = new Date(expiresAt).toLocaleDateString(
+    isEs ? "es-MX" : "en-US",
+    { day: "numeric", month: "long", year: "numeric" }
+  );
+
+  function handleCopy() {
+    navigator.clipboard.writeText(code);
+    setCopied(true);
+    setTimeout(() => setCopied(false), 2000);
+  }
+
+  return (
+    <div
+      className={`relative overflow-hidden rounded-xl border-2 border-dashed ${
+        inactive
+          ? "border-base-300 bg-base-200/50 opacity-60"
+          : "border-primary/30 bg-primary/5"
+      } p-5`}
+    >
+      <div className="flex items-start justify-between gap-3">
+        <div>
+          <div className="flex items-center gap-2 mb-1">
+            <Ticket className="h-4 w-4 text-primary" />
+            <span className="text-xs tracking-wider uppercase text-base-content/50 font-semibold">
+              {isEs ? "Tu cupón de bienvenida" : "Your welcome coupon"}
+            </span>
+          </div>
+          <p className="text-2xl font-bold text-primary">{discount}% OFF</p>
+          <p className="text-xs text-base-content/40 mt-1">
+            {isRedeemed
+              ? isEs
+                ? "Cupón ya utilizado"
+                : "Coupon already used"
+              : expired
+                ? isEs
+                  ? "Cupón expirado"
+                  : "Coupon expired"
+                : isEs
+                  ? "En tu primera compra"
+                  : "On your first purchase"}
+          </p>
+        </div>
+      </div>
+
+      {/* Code */}
+      <div className="mt-4 flex items-center gap-2">
+        <code
+          className={`flex-1 text-center text-sm font-mono font-bold tracking-widest py-2 px-3 rounded-lg ${
+            inactive
+              ? "bg-base-300/50 text-base-content/40 line-through"
+              : "bg-base-100 text-base-content"
+          }`}
+        >
+          {code}
+        </code>
+        {!inactive && (
+          <button
+            onClick={handleCopy}
+            className="btn btn-ghost btn-sm btn-square"
+            aria-label="Copy code"
+          >
+            {copied ? (
+              <Check className="h-4 w-4 text-success" />
+            ) : (
+              <Copy className="h-4 w-4" />
+            )}
+          </button>
+        )}
+      </div>
+
+      {/* Expiry */}
+      <p className="text-[11px] text-base-content/30 mt-3">
+        {inactive
+          ? isEs
+            ? `Expiró el ${expiryLabel}`
+            : `Expired on ${expiryLabel}`
+          : isEs
+            ? `Válido hasta el ${expiryLabel}`
+            : `Valid until ${expiryLabel}`}
+      </p>
+    </div>
+  );
+}
+
+/* ─── Main form ────────────────────────────────────────────── */
 
 function LoginForm({ lang }: { lang: string }) {
   const searchParams = useSearchParams();
@@ -47,7 +165,32 @@ function LoginForm({ lang }: { lang: string }) {
   const { user, loading, signOut } = useAuth();
   const isEs = lang === "es";
 
+  const [signingIn, setSigningIn] = useState<Provider | null>(null);
+  const [coupon, setCoupon] = useState<{
+    code: string;
+    discount_percent: number;
+    is_redeemed: boolean;
+    expires_at: string;
+  } | null>(null);
+  const [couponLoading, setCouponLoading] = useState(false);
+  const [isAdmin, setIsAdmin] = useState(false);
+
+  // Check admin status
+  useEffect(() => {
+    if (!user) return;
+    const supabase = createClient();
+    supabase
+      .from("profiles")
+      .select("is_admin")
+      .eq("user_id", user.id)
+      .single()
+      .then(({ data }) => {
+        if (data?.is_admin) setIsAdmin(true);
+      });
+  }, [user]);
+
   const handleOAuthLogin = async (provider: Provider) => {
+    setSigningIn(provider);
     const supabase = createClient();
     await supabase.auth.signInWithOAuth({
       provider,
@@ -62,10 +205,50 @@ function LoginForm({ lang }: { lang: string }) {
     router.push(`/${lang}/shop`);
   };
 
+  // Fetch or create coupon when user is authenticated
+  const fetchOrCreateCoupon = useCallback(async (userId: string) => {
+    setCouponLoading(true);
+    const supabase = createClient();
+
+    // Try to fetch existing coupon
+    const { data: existing } = await supabase
+      .schema("magnolia")
+      .from("coupons")
+      .select("code, discount_percent, is_redeemed, expires_at")
+      .eq("user_id", userId)
+      .single();
+
+    if (existing) {
+      setCoupon(existing);
+      setCouponLoading(false);
+      return;
+    }
+
+    // Create a new welcome coupon
+    const code = generateCouponCode();
+    const { data: created } = await supabase
+      .schema("magnolia")
+      .from("coupons")
+      .insert({ user_id: userId, code, discount_percent: 30 })
+      .select("code, discount_percent, is_redeemed, expires_at")
+      .single();
+
+    if (created) {
+      setCoupon(created);
+    }
+    setCouponLoading(false);
+  }, []);
+
+  useEffect(() => {
+    if (user) {
+      fetchOrCreateCoupon(user.id);
+    }
+  }, [user, fetchOrCreateCoupon]);
+
   // Loading
   if (loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-base-100">
+      <div className="min-h-dvh flex items-center justify-center bg-base-100">
         <span className="loading loading-spinner loading-lg text-primary" />
       </div>
     );
@@ -84,13 +267,22 @@ function LoginForm({ lang }: { lang: string }) {
     const initials = getInitials(fullName);
     const greeting = getGreeting(isEs);
     const memberSince = user.created_at
-      ? new Date(user.created_at).toLocaleDateString(isEs ? "es-MX" : "en-US", {
-          month: "long",
-          year: "numeric",
-        })
+      ? new Date(user.created_at).toLocaleDateString(
+          isEs ? "es-MX" : "en-US",
+          { month: "long", year: "numeric" }
+        )
       : null;
 
     const accountLinks = [
+      ...(isAdmin
+        ? [
+            {
+              label: isEs ? "Panel de admin" : "Admin dashboard",
+              href: `/${lang}/admin`,
+              icon: LayoutDashboard,
+            },
+          ]
+        : []),
       {
         label: isEs ? "Mis favoritos" : "My favorites",
         href: `/${lang}/favorites`,
@@ -147,14 +339,11 @@ function LoginForm({ lang }: { lang: string }) {
         {/* Profile hero */}
         <div className="max-w-lg w-full mx-auto px-6 pt-10 pb-8">
           <div className="flex items-center gap-5">
-            {/* Avatar */}
             <div className="avatar avatar-placeholder shrink-0">
               <div className="bg-primary text-primary-content w-16 rounded-full">
                 <span className="text-xl font-semibold">{initials}</span>
               </div>
             </div>
-
-            {/* Greeting + info */}
             <div className="min-w-0">
               <p className="text-xs text-base-content/40 tracking-wider uppercase mb-0.5">
                 {greeting}
@@ -163,7 +352,9 @@ function LoginForm({ lang }: { lang: string }) {
                 {firstName}
               </h1>
               {email && (
-                <p className="text-sm text-base-content/40 truncate">{email}</p>
+                <p className="text-sm text-base-content/40 truncate">
+                  {email}
+                </p>
               )}
             </div>
           </div>
@@ -184,6 +375,23 @@ function LoginForm({ lang }: { lang: string }) {
               </span>
             )}
           </div>
+        </div>
+
+        {/* Coupon */}
+        <div className="max-w-lg w-full mx-auto px-6 mt-6">
+          {couponLoading ? (
+            <div className="flex items-center justify-center py-8">
+              <span className="loading loading-dots loading-sm text-primary" />
+            </div>
+          ) : coupon ? (
+            <CouponCard
+              code={coupon.code}
+              discount={coupon.discount_percent}
+              isRedeemed={coupon.is_redeemed}
+              expiresAt={coupon.expires_at}
+              isEs={isEs}
+            />
+          ) : null}
         </div>
 
         {/* Divider */}
@@ -217,7 +425,7 @@ function LoginForm({ lang }: { lang: string }) {
           </ul>
         </nav>
 
-        {/* Sign out — pushed to bottom */}
+        {/* Sign out */}
         <div className="max-w-lg w-full mx-auto px-6 mt-auto pb-10 pt-8">
           <button
             onClick={handleSignOut}
@@ -231,9 +439,9 @@ function LoginForm({ lang }: { lang: string }) {
     );
   }
 
-  // Unauthenticated — login form
+  // ─── Unauthenticated — login form ────────────────────────
   return (
-    <div className="min-h-screen bg-base-100 flex flex-col">
+    <div className="min-h-dvh bg-base-100 flex flex-col">
       {/* Top bar */}
       <div className="flex items-center p-6">
         <Link
@@ -277,20 +485,41 @@ function LoginForm({ lang }: { lang: string }) {
             </h1>
             <p className="text-base-content/50 text-sm mt-2">
               {isEs
-                ? "Inicia sesion para acceder a tu cuenta"
+                ? "Inicia sesión para acceder a tu cuenta"
                 : "Sign in to access your account"}
             </p>
           </div>
 
+          {/* Promo badge */}
+          <div className="flex justify-center mb-6">
+            <span className="badge badge-primary badge-soft gap-1.5 text-xs">
+              <Ticket className="h-3 w-3" />
+              {isEs
+                ? "30% de descuento en tu primera compra"
+                : "30% off your first purchase"}
+            </span>
+          </div>
+
           {/* Error */}
           {error && (
-            <div className="alert alert-error alert-soft text-sm mb-6">
-              <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L4.082 16.5c-.77.833.192 2.5 1.732 2.5z" />
+            <div role="alert" className="alert alert-error alert-soft text-sm mb-6">
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                className="h-5 w-5 shrink-0"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L4.082 16.5c-.77.833.192 2.5 1.732 2.5z"
+                />
               </svg>
               <span>
                 {isEs
-                  ? "Ocurrio un error al iniciar sesion. Intenta de nuevo."
+                  ? "Ocurrió un error al iniciar sesión. Intenta de nuevo."
                   : "An error occurred while signing in. Please try again."}
               </span>
             </div>
@@ -298,33 +527,93 @@ function LoginForm({ lang }: { lang: string }) {
 
           {/* OAuth buttons */}
           <div className="flex flex-col gap-3">
+            {/* Google */}
             <button
               onClick={() => handleOAuthLogin("google")}
-              className="btn bg-white text-black border-[#e5e5e5] hover:bg-gray-50 gap-3 h-12"
+              disabled={signingIn !== null}
+              className="btn border border-base-300 bg-base-100 hover:bg-base-200 text-base-content gap-3 h-12"
             >
-              <svg aria-label="Google logo" width="18" height="18" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
-                <g><path d="m0 0H512V512H0" fill="#fff"></path><path fill="#34a853" d="M153 292c30 82 118 95 171 60h62v48A192 192 0 0190 341"></path><path fill="#4285f4" d="m386 400a140 175 0 0053-179H260v74h102q-7 37-38 57"></path><path fill="#fbbc02" d="m90 341a208 200 0 010-171l63 49q-12 37 0 73"></path><path fill="#ea4335" d="m153 219c22-69 116-109 179-50l55-54c-78-75-230-72-297 55"></path></g>
-              </svg>
+              {signingIn === "google" ? (
+                <span className="loading loading-spinner loading-sm" />
+              ) : (
+                <svg
+                  aria-label="Google logo"
+                  width="18"
+                  height="18"
+                  xmlns="http://www.w3.org/2000/svg"
+                  viewBox="0 0 512 512"
+                >
+                  <g>
+                    <path d="m0 0H512V512H0" fill="#fff" />
+                    <path
+                      fill="#34a853"
+                      d="M153 292c30 82 118 95 171 60h62v48A192 192 0 0190 341"
+                    />
+                    <path
+                      fill="#4285f4"
+                      d="m386 400a140 175 0 0053-179H260v74h102q-7 37-38 57"
+                    />
+                    <path
+                      fill="#fbbc02"
+                      d="m90 341a208 200 0 010-171l63 49q-12 37 0 73"
+                    />
+                    <path
+                      fill="#ea4335"
+                      d="m153 219c22-69 116-109 179-50l55-54c-78-75-230-72-297 55"
+                    />
+                  </g>
+                </svg>
+              )}
               {isEs ? "Continuar con Google" : "Continue with Google"}
             </button>
 
+            {/* Apple */}
             <button
               onClick={() => handleOAuthLogin("apple")}
+              disabled={signingIn !== null}
               className="btn btn-neutral gap-3 h-12"
             >
-              <svg aria-label="Apple logo" width="18" height="18" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1195 1195">
-                <path fill="currentColor" d="M1006.933 812.8c-32 153.6-115.2 211.2-147.2 249.6-32 25.6-121.6 25.6-153.6 6.4-38.4-25.6-134.4-25.6-166.4 0-44.8 32-115.2 19.2-128 12.8-256-179.2-352-716.8 12.8-774.4 64-12.8 134.4 32 134.4 32 51.2 25.6 70.4 12.8 115.2-6.4 96-44.8 243.2-44.8 313.6 76.8-147.2 96-153.6 294.4 19.2 403.2zM802.133 64c12.8 70.4-64 224-204.8 230.4-12.8-38.4 32-217.6 204.8-230.4z"></path>
-              </svg>
+              {signingIn === "apple" ? (
+                <span className="loading loading-spinner loading-sm" />
+              ) : (
+                <svg
+                  aria-label="Apple logo"
+                  width="18"
+                  height="18"
+                  xmlns="http://www.w3.org/2000/svg"
+                  viewBox="0 0 1195 1195"
+                >
+                  <path
+                    fill="currentColor"
+                    d="M1006.933 812.8c-32 153.6-115.2 211.2-147.2 249.6-32 25.6-121.6 25.6-153.6 6.4-38.4-25.6-134.4-25.6-166.4 0-44.8 32-115.2 19.2-128 12.8-256-179.2-352-716.8 12.8-774.4 64-12.8 134.4 32 134.4 32 51.2 25.6 70.4 12.8 115.2-6.4 96-44.8 243.2-44.8 313.6 76.8-147.2 96-153.6 294.4 19.2 403.2zM802.133 64c12.8 70.4-64 224-204.8 230.4-12.8-38.4 32-217.6 204.8-230.4z"
+                  />
+                </svg>
+              )}
               {isEs ? "Continuar con Apple" : "Continue with Apple"}
             </button>
 
+            {/* Facebook */}
             <button
               onClick={() => handleOAuthLogin("facebook")}
+              disabled={signingIn !== null}
               className="btn bg-[#1877F2] text-white border-[#0d6ae4] hover:bg-[#166FE5] gap-3 h-12"
             >
-              <svg aria-label="Facebook logo" width="18" height="18" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32">
-                <path fill="white" d="M8 12h5V8c0-6 4-7 11-6v5c-4 0-5 0-5 3v2h5l-1 6h-4v12h-6V18H8z"></path>
-              </svg>
+              {signingIn === "facebook" ? (
+                <span className="loading loading-spinner loading-sm" />
+              ) : (
+                <svg
+                  aria-label="Facebook logo"
+                  width="18"
+                  height="18"
+                  xmlns="http://www.w3.org/2000/svg"
+                  viewBox="0 0 32 32"
+                >
+                  <path
+                    fill="white"
+                    d="M8 12h5V8c0-6 4-7 11-6v5c-4 0-5 0-5 3v2h5l-1 6h-4v12h-6V18H8z"
+                  />
+                </svg>
+              )}
               {isEs ? "Continuar con Facebook" : "Continue with Facebook"}
             </button>
           </div>
@@ -344,16 +633,38 @@ function LoginForm({ lang }: { lang: string }) {
             {isEs ? (
               <>
                 Al continuar, aceptas nuestros{" "}
-                <Link href={`/${lang}/terms`} className="link link-hover">Terminos de Servicio</Link>
-                {" "}y{" "}
-                <Link href={`/${lang}/privacy`} className="link link-hover">Politica de Privacidad</Link>.
+                <Link
+                  href={`/${lang}/terms`}
+                  className="link link-hover"
+                >
+                  Términos de Servicio
+                </Link>{" "}
+                y{" "}
+                <Link
+                  href={`/${lang}/privacy`}
+                  className="link link-hover"
+                >
+                  Política de Privacidad
+                </Link>
+                .
               </>
             ) : (
               <>
                 By continuing, you agree to our{" "}
-                <Link href={`/${lang}/terms`} className="link link-hover">Terms of Service</Link>
-                {" "}and{" "}
-                <Link href={`/${lang}/privacy`} className="link link-hover">Privacy Policy</Link>.
+                <Link
+                  href={`/${lang}/terms`}
+                  className="link link-hover"
+                >
+                  Terms of Service
+                </Link>{" "}
+                and{" "}
+                <Link
+                  href={`/${lang}/privacy`}
+                  className="link link-hover"
+                >
+                  Privacy Policy
+                </Link>
+                .
               </>
             )}
           </p>
@@ -371,7 +682,7 @@ export default function LoginPage({
   return (
     <Suspense
       fallback={
-        <div className="min-h-screen flex items-center justify-center bg-base-100">
+        <div className="min-h-dvh flex items-center justify-center bg-base-100">
           <span className="loading loading-spinner loading-lg text-primary" />
         </div>
       }

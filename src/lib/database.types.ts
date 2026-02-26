@@ -14,6 +14,39 @@ export type Database = {
   }
   magnolia: {
     Tables: {
+      coupons: {
+        Row: {
+          id: string
+          user_id: string
+          code: string
+          discount_percent: number
+          is_redeemed: boolean
+          created_at: string
+          redeemed_at: string | null
+          expires_at: string
+        }
+        Insert: {
+          id?: string
+          user_id: string
+          code: string
+          discount_percent?: number
+          is_redeemed?: boolean
+          created_at?: string
+          redeemed_at?: string | null
+          expires_at?: string
+        }
+        Update: {
+          id?: string
+          user_id?: string
+          code?: string
+          discount_percent?: number
+          is_redeemed?: boolean
+          created_at?: string
+          redeemed_at?: string | null
+          expires_at?: string
+        }
+        Relationships: []
+      }
       favorites: {
         Row: {
           id: string
@@ -42,6 +75,24 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      profiles: {
+        Row: {
+          user_id: string
+          is_admin: boolean
+          created_at: string
+        }
+        Insert: {
+          user_id: string
+          is_admin?: boolean
+          created_at?: string
+        }
+        Update: {
+          user_id?: string
+          is_admin?: boolean
+          created_at?: string
+        }
+        Relationships: []
       }
       categories: {
         Row: {
