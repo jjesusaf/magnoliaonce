@@ -6,6 +6,8 @@ import {
   useReducer,
   useEffect,
   useCallback,
+  useState,
+  useRef,
   type ReactNode,
 } from "react";
 
@@ -21,6 +23,8 @@ export type CartItem = {
   imageUrl: string;
   quantity: number;
 };
+
+export type LastAddedItem = Omit<CartItem, "quantity"> & { addedAt: number };
 
 type CartState = {
   items: CartItem[];
@@ -108,6 +112,8 @@ type CartContextValue = {
   closeCart: () => void;
   totalItems: number;
   totalPrice: number;
+  lastAdded: LastAddedItem | null;
+  dismissLastAdded: () => void;
 };
 
 const CartContext = createContext<CartContextValue | null>(null);
@@ -121,6 +127,8 @@ export function CartProvider({ children }: { children: ReactNode }) {
     items: [],
     isOpen: false,
   });
+  const [lastAdded, setLastAdded] = useState<LastAddedItem | null>(null);
+  const toastTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   // Hydrate from localStorage on mount
   useEffect(() => {
@@ -141,10 +149,18 @@ export function CartProvider({ children }: { children: ReactNode }) {
   }, [state.items]);
 
   const addItem = useCallback(
-    (item: Omit<CartItem, "quantity">, qty?: number) =>
-      dispatch({ type: "add", item, qty }),
+    (item: Omit<CartItem, "quantity">, qty?: number) => {
+      dispatch({ type: "add", item, qty });
+      setLastAdded({ ...item, addedAt: Date.now() });
+      if (toastTimer.current) clearTimeout(toastTimer.current);
+      toastTimer.current = setTimeout(() => setLastAdded(null), 3500);
+    },
     [],
   );
+  const dismissLastAdded = useCallback(() => {
+    setLastAdded(null);
+    if (toastTimer.current) clearTimeout(toastTimer.current);
+  }, []);
   const removeItem = useCallback(
     (variantId: string) => dispatch({ type: "remove", variantId }),
     [],
@@ -177,6 +193,8 @@ export function CartProvider({ children }: { children: ReactNode }) {
         closeCart,
         totalItems,
         totalPrice,
+        lastAdded,
+        dismissLastAdded,
       }}
     >
       {children}
