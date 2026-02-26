@@ -2,17 +2,9 @@ import { NextResponse } from "next/server";
 import { createClient } from "@/lib/supabase/server";
 
 export async function GET(request: Request) {
-  const requestUrl = new URL(request.url);
-  const code = requestUrl.searchParams.get("code");
-  const next = requestUrl.searchParams.get("next") ?? "/es";
-
-  // In production (Vercel), request.url reports localhost as origin.
-  // Use forwarded headers to get the real origin.
-  const forwardedHost = request.headers.get("x-forwarded-host");
-  const forwardedProto = request.headers.get("x-forwarded-proto") ?? "https";
-  const origin = forwardedHost
-    ? `${forwardedProto}://${forwardedHost}`
-    : requestUrl.origin;
+  const { searchParams, origin } = new URL(request.url);
+  const code = searchParams.get("code");
+  const next = searchParams.get("next") ?? "/es/shop";
 
   if (code) {
     const supabase = await createClient();
@@ -22,7 +14,6 @@ export async function GET(request: Request) {
     }
   }
 
-  // Extract lang from the `next` param to keep the correct locale on error
   const lang = next.startsWith("/en") ? "en" : "es";
   return NextResponse.redirect(`${origin}/${lang}/login?error=auth`);
 }
