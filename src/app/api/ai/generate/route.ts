@@ -13,7 +13,7 @@ IMPORTANT RULES:
 - Descriptions should be 1-2 sentences, poetic but informative. Mention key flowers, colors, and style.
 - Suggest 2-3 size variants (e.g. Petit/Clásico/Grand or Chico/Mediano/Grande) with realistic Mexican florist prices.
 - MXN prices should range from $400-$2500 depending on size. USD prices should be roughly MXN/17.
-- The slug should be the Spanish name, lowercase, hyphenated, no accents.
+- The slug must be unique and descriptive. Combine the Spanish name with a distinguishing detail (e.g. dominant flower, color, or style). Examples: "aurora-rosas-rojas", "serenata-pastel-peonias", "jardín-silvestre-lavanda". Lowercase, hyphenated, no accents, no generic slugs like "ramo-de-rosas".
 
 Respond ONLY with valid JSON in this exact format:
 {

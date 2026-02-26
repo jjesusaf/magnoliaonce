@@ -340,6 +340,29 @@ function ProductFormModal({
     try {
       let productId: string;
 
+      // Ensure slug is unique before saving
+      let finalSlug = formSlug;
+      if (!editingProduct || editingProduct.slug !== formSlug) {
+        const { count } = await supabase
+          .from("products")
+          .select("id", { count: "exact", head: true })
+          .eq("slug", formSlug);
+        if (count && count > 0) {
+          let suffix = 2;
+          let candidate = `${formSlug}-${suffix}`;
+          while (true) {
+            const { count: c } = await supabase
+              .from("products")
+              .select("id", { count: "exact", head: true })
+              .eq("slug", candidate);
+            if (!c || c === 0) break;
+            suffix++;
+            candidate = `${formSlug}-${suffix}`;
+          }
+          finalSlug = candidate;
+        }
+      }
+
       if (editingProduct) {
         const { error } = await supabase
           .from("products")
@@ -348,7 +371,7 @@ function ProductFormModal({
             name_en: formNameEn,
             description_es: formDescEs || null,
             description_en: formDescEn || null,
-            slug: formSlug,
+            slug: finalSlug,
             category_id: formCategoryId,
           })
           .eq("id", editingProduct.id);
@@ -372,7 +395,7 @@ function ProductFormModal({
             name_en: formNameEn,
             description_es: formDescEs || null,
             description_en: formDescEn || null,
-            slug: formSlug,
+            slug: finalSlug,
             category_id: formCategoryId,
             sort_order: maxSort + 1,
           })
@@ -424,9 +447,26 @@ function ProductFormModal({
 
       onSaved();
       handleClose();
-    } catch (err) {
+    } catch (err: unknown) {
       console.error("Save error:", err);
-      alert(isEs ? "Error al guardar" : "Error saving");
+      const supaErr = err as { code?: string; message?: string } | undefined;
+      let msg: string;
+      if (supaErr?.code === "23505") {
+        msg = isEs
+          ? "Ya existe un producto con ese slug. Cambia el nombre e intenta de nuevo."
+          : "A product with that slug already exists. Change the name and try again.";
+      } else if (supaErr?.code === "23503") {
+        msg = isEs
+          ? "La categoría seleccionada no es válida."
+          : "The selected category is not valid.";
+      } else if (supaErr?.message) {
+        msg = isEs
+          ? `Error al guardar: ${supaErr.message}`
+          : `Error saving: ${supaErr.message}`;
+      } else {
+        msg = isEs ? "Error al guardar" : "Error saving";
+      }
+      alert(msg);
     } finally {
       setSaving(false);
     }
