@@ -3,9 +3,10 @@
 import { use, useEffect, useState } from "react";
 import Link from "next/link";
 import Image from "next/image";
-import { Heart, ArrowLeft } from "lucide-react";
+import { Heart, ArrowLeft, ShoppingBag, Sparkles, Trash2 } from "lucide-react";
 import { useAuth } from "@/lib/auth-context";
 import { useFavorites } from "@/lib/favorites-context";
+import { useCart } from "@/lib/cart-context";
 import { createClient } from "@/lib/supabase/client";
 import { FavoriteButton } from "@/components/shop/favorite-button";
 import { getImageUrl } from "@/lib/storage";
@@ -24,15 +25,30 @@ type FavoriteProduct = {
     alt_es: string | null;
     alt_en: string | null;
   }[];
-  product_variants: { price: number; currency: string }[];
+  product_variants: { id: string; price: number; currency: string; label: string }[];
   categories: { slug: string } | null;
 };
 
+/* ─── Skeleton card for loading state ─── */
+function SkeletonCard() {
+  return (
+    <div className="flex flex-col gap-3 animate-pulse">
+      <div className="aspect-[3/4] w-full rounded-box bg-base-200" />
+      <div className="space-y-2 px-1">
+        <div className="h-3 bg-base-200 rounded-full w-3/4" />
+        <div className="h-3 bg-base-200 rounded-full w-1/2" />
+      </div>
+    </div>
+  );
+}
+
 function FavoritesContent({ lang }: { lang: string }) {
   const { user, loading: authLoading } = useAuth();
-  const { count } = useFavorites();
+  const { count, toggleFavorite } = useFavorites();
+  const { addItem } = useCart();
   const [products, setProducts] = useState<FavoriteProduct[]>([]);
   const [loading, setLoading] = useState(true);
+  const [removingId, setRemovingId] = useState<string | null>(null);
   const isEs = lang === "es";
 
   useEffect(() => {
@@ -46,7 +62,7 @@ function FavoritesContent({ lang }: { lang: string }) {
     supabase
       .from("favorites")
       .select(
-        "product_id, products(id, slug, name_es, name_en, category_id, product_images!inner(storage_path, alt_es, alt_en, is_primary), product_variants(price, currency), categories(slug))"
+        "product_id, products(id, slug, name_es, name_en, category_id, product_images!inner(storage_path, alt_es, alt_en, is_primary), product_variants(id, price, currency, label), categories(slug))"
       )
       .eq("user_id", user.id)
       .eq("products.product_images.is_primary", true)
@@ -60,46 +76,109 @@ function FavoritesContent({ lang }: { lang: string }) {
         }
         setLoading(false);
       });
-    // refetch when favorites count changes (toggle)
   }, [user, authLoading, count]);
 
+  const handleRemove = (productId: string) => {
+    setRemovingId(productId);
+    setTimeout(() => {
+      toggleFavorite(productId);
+      setRemovingId(null);
+    }, 300);
+  };
+
+  const handleAddToCart = (product: FavoriteProduct) => {
+    const currency = currencyForLang(lang);
+    const langVariants = product.product_variants.filter(
+      (v) => v.currency === currency
+    );
+    const variant = langVariants.length
+      ? langVariants.reduce((min, v) => (v.price < min.price ? v : min))
+      : null;
+    if (!variant) return;
+
+    const image = product.product_images[0];
+    const imageUrl = image
+      ? getImageUrl(BUCKET, image.storage_path, {
+          width: 200,
+          height: 200,
+          resize: "cover",
+        }) || ""
+      : "";
+
+    addItem({
+      productId: product.id,
+      variantId: variant.id,
+      productName: localized(product, "name", lang),
+      variantLabel: variant.label,
+      price: variant.price,
+      currency: variant.currency,
+      imageUrl,
+    });
+  };
+
+  /* ─── Loading: skeleton grid ─── */
   if (authLoading || loading) {
     return (
-      <div className="min-h-dvh flex items-center justify-center bg-base-100">
-        <span className="loading loading-spinner loading-lg text-primary" />
-      </div>
+      <main className="pt-16 pb-28 lg:pb-0 flex flex-col min-h-dvh">
+        <section className="flex-1 px-6 py-8 lg:px-16 lg:py-12">
+          <div className="h-4 bg-base-200 rounded-full w-40 mb-8 animate-pulse" />
+          <div className="h-8 bg-base-200 rounded-full w-60 mb-2 animate-pulse" />
+          <div className="h-4 bg-base-200 rounded-full w-32 mb-10 animate-pulse" />
+          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 lg:gap-6">
+            {Array.from({ length: 8 }).map((_, i) => (
+              <SkeletonCard key={i} />
+            ))}
+          </div>
+        </section>
+      </main>
     );
   }
 
+  /* ─── Not authenticated ─── */
   if (!user) {
     return (
-      <div className="min-h-dvh bg-base-100 flex flex-col items-center justify-center px-6 text-center">
-        <Heart className="h-12 w-12 text-base-content/20 mb-4" />
-        <h1 className="text-xl font-semibold mb-2">
-          {isEs ? "Inicia sesion para ver tus favoritos" : "Sign in to view your favorites"}
+      <main className="min-h-dvh flex flex-col items-center justify-center px-6 text-center pt-16">
+        <div className="relative mb-8">
+          <div className="w-28 h-28 rounded-full bg-primary/10 flex items-center justify-center">
+            <Heart className="h-12 w-12 text-primary/60" />
+          </div>
+          <div className="absolute -top-1 -right-1 w-8 h-8 rounded-full bg-secondary/20 flex items-center justify-center">
+            <Sparkles className="h-4 w-4 text-secondary" />
+          </div>
+        </div>
+        <h1 className="text-2xl lg:text-3xl tracking-widest uppercase mb-3">
+          {isEs ? "Tus favoritos te esperan" : "Your favorites await"}
         </h1>
-        <p className="text-base-content/50 text-sm mb-6">
+        <p className="text-base-content/50 text-sm max-w-sm mb-8 leading-relaxed">
           {isEs
-            ? "Guarda tus productos favoritos para encontrarlos facilmente"
-            : "Save your favorite products to find them easily"}
+            ? "Inicia sesión para guardar tus productos favoritos y encontrarlos fácilmente"
+            : "Sign in to save your favorite products and find them easily"}
         </p>
-        <Link href={`/${lang}/login`} className="btn btn-primary">
-          {isEs ? "Iniciar sesion" : "Sign in"}
+        <Link href={`/${lang}/login`} className="btn btn-primary px-8">
+          {isEs ? "Iniciar sesión" : "Sign in"}
         </Link>
-      </div>
+        <Link
+          href={`/${lang}/shop`}
+          className="btn btn-ghost btn-sm mt-4 gap-2 text-base-content/50"
+        >
+          <ArrowLeft className="h-4 w-4" />
+          {isEs ? "Explorar tienda" : "Browse shop"}
+        </Link>
+      </main>
     );
   }
 
+  /* ─── Authenticated ─── */
   return (
     <main className="pt-16 pb-28 lg:pb-0 flex flex-col min-h-dvh">
       <section className="flex-1 px-6 py-8 lg:px-16 lg:py-12">
         {/* Breadcrumbs */}
-        <div className="breadcrumbs text-sm mb-8">
+        <div className="breadcrumbs text-sm mb-6">
           <ul>
             <li>
               <Link
                 href={`/${lang}/shop`}
-                className="tracking-widest uppercase text-base-content/60 hover:text-base-content transition-colors"
+                className="tracking-widest uppercase text-base-content/50 hover:text-base-content transition-colors"
               >
                 {isEs ? "Tienda" : "Shop"}
               </Link>
@@ -112,30 +191,62 @@ function FavoritesContent({ lang }: { lang: string }) {
           </ul>
         </div>
 
-        <h1 className="text-2xl lg:text-3xl tracking-widest uppercase mb-8 lg:mb-12">
-          {isEs ? "Mis favoritos" : "My favorites"}
-        </h1>
+        {/* Header */}
+        <div className="flex items-end justify-between mb-10 lg:mb-14">
+          <div>
+            <h1 className="text-2xl lg:text-4xl tracking-widest uppercase">
+              {isEs ? "Mis favoritos" : "My favorites"}
+            </h1>
+            {products.length > 0 && (
+              <p className="text-base-content/40 text-sm mt-2 tracking-wide">
+                {products.length}{" "}
+                {isEs
+                  ? products.length === 1
+                    ? "producto"
+                    : "productos"
+                  : products.length === 1
+                  ? "item"
+                  : "items"}
+              </p>
+            )}
+          </div>
+          {products.length > 0 && (
+            <Link
+              href={`/${lang}/shop`}
+              className="btn btn-ghost btn-sm gap-2 text-base-content/50 hidden sm:inline-flex"
+            >
+              <ArrowLeft className="h-4 w-4" />
+              {isEs ? "Seguir comprando" : "Continue shopping"}
+            </Link>
+          )}
+        </div>
 
         {products.length === 0 ? (
-          <div className="flex flex-col items-center justify-center py-20 text-center">
-            <Heart className="h-12 w-12 text-base-content/15 mb-4" />
-            <p className="text-base-content/50 mb-1">
-              {isEs ? "Aun no tienes favoritos" : "No favorites yet"}
-            </p>
-            <p className="text-base-content/30 text-sm mb-6">
+          /* ─── Empty state ─── */
+          <div className="flex flex-col items-center justify-center py-16 lg:py-24 text-center">
+            <div className="relative mb-8">
+              <div className="w-24 h-24 rounded-full bg-base-200 flex items-center justify-center">
+                <Heart className="h-10 w-10 text-base-content/15" />
+              </div>
+            </div>
+            <h2 className="text-lg font-semibold mb-2 tracking-wide">
+              {isEs ? "Aún no tienes favoritos" : "No favorites yet"}
+            </h2>
+            <p className="text-base-content/40 text-sm max-w-xs mb-8 leading-relaxed">
               {isEs
-                ? "Toca el corazon en cualquier producto para guardarlo aqui"
+                ? "Toca el corazón en cualquier producto para guardarlo aquí"
                 : "Tap the heart on any product to save it here"}
             </p>
             <Link
               href={`/${lang}/shop`}
-              className="btn btn-ghost btn-sm gap-2 text-base-content/60"
+              className="btn btn-primary btn-sm gap-2 px-6"
             >
               <ArrowLeft className="h-4 w-4" />
               {isEs ? "Explorar tienda" : "Browse shop"}
             </Link>
           </div>
         ) : (
+          /* ─── Product grid ─── */
           <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 lg:gap-6">
             {products.map((product) => {
               const name = localized(product, "name", lang);
@@ -143,7 +254,7 @@ function FavoritesContent({ lang }: { lang: string }) {
               const imageUrl = image
                 ? getImageUrl(BUCKET, image.storage_path, {
                     width: 600,
-                    height: 600,
+                    height: 800,
                     resize: "cover",
                   })
                 : null;
@@ -158,41 +269,82 @@ function FavoritesContent({ lang }: { lang: string }) {
                   )
                 : null;
               const catSlug = product.categories?.slug ?? "";
+              const isRemoving = removingId === product.id;
 
               return (
-                <div key={product.id} className="relative group">
+                <div
+                  key={product.id}
+                  className={`relative group transition-all duration-300 ${
+                    isRemoving ? "opacity-0 scale-95" : "opacity-100 scale-100"
+                  }`}
+                >
+                  {/* Card */}
                   <Link
                     href={`/${lang}/shop/${catSlug}/${product.slug}`}
-                    className="group flex flex-col"
+                    className="block rounded-box overflow-hidden bg-base-200/50 hover:shadow-lg transition-shadow duration-300"
                   >
-                    <div className="aspect-square w-full overflow-hidden bg-base-200">
+                    {/* Image */}
+                    <div className="aspect-[3/4] w-full overflow-hidden bg-base-200 relative">
                       {imageUrl && (
                         <Image
                           src={imageUrl}
                           alt={alt}
                           width={600}
-                          height={600}
+                          height={800}
                           className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
                         />
                       )}
                     </div>
-                    <div className="mt-3 space-y-1">
-                      <h3 className="text-sm tracking-widest uppercase text-base-content/80 group-hover:text-base-content transition-colors">
+
+                    {/* Info */}
+                    <div className="p-3 lg:p-4 space-y-1">
+                      <h3 className="text-xs lg:text-sm tracking-widest uppercase text-base-content/80 group-hover:text-base-content transition-colors line-clamp-2">
                         {name}
                       </h3>
                       {cheapest && (
-                        <p className="text-sm text-base-content/60">
-                          {isEs ? "Desde" : "From"}{" "}
+                        <p className="text-sm lg:text-base font-semibold text-base-content">
+                          {isEs ? "Desde " : "From "}
                           {formatPrice(cheapest.price, cheapest.currency)}
                         </p>
                       )}
                     </div>
                   </Link>
-                  <FavoriteButton
-                    productId={product.id}
-                    lang={lang}
-                    variant="card"
-                  />
+
+                  {/* Action buttons overlay */}
+                  <div className="absolute top-2 right-2 z-10 flex flex-col gap-1">
+                    {/* Favorite (remove) button */}
+                    <button
+                      onClick={(e) => {
+                        e.preventDefault();
+                        e.stopPropagation();
+                        handleRemove(product.id);
+                      }}
+                      className="btn btn-circle btn-sm bg-base-100/80 backdrop-blur-sm shadow-sm border-0 opacity-0 group-hover:opacity-100 transition-opacity"
+                      aria-label={isEs ? "Quitar de favoritos" : "Remove from favorites"}
+                    >
+                      <Trash2 className="h-3.5 w-3.5 text-error/70" />
+                    </button>
+                  </div>
+
+                  {/* Favorite heart - always visible */}
+                  <div className="absolute top-2 left-2 z-10">
+                    <Heart className="h-4 w-4 fill-red-500 text-red-500 drop-shadow-sm" />
+                  </div>
+
+                  {/* Quick add to cart */}
+                  {cheapest && (
+                    <button
+                      onClick={(e) => {
+                        e.preventDefault();
+                        e.stopPropagation();
+                        handleAddToCart(product);
+                      }}
+                      className="absolute bottom-[4.5rem] lg:bottom-[5.5rem] right-2 z-10 btn btn-circle btn-sm bg-primary text-primary-content shadow-md border-0 opacity-0 group-hover:opacity-100 translate-y-1 group-hover:translate-y-0 transition-all duration-200"
+                      aria-label={isEs ? "Agregar al carrito" : "Add to cart"}
+                    >
+                      <ShoppingBag className="h-3.5 w-3.5" />
+                    </button>
+                  )}
                 </div>
               );
             })}

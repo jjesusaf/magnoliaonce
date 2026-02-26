@@ -16,7 +16,7 @@ export default function CategoryLoading() {
         <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 lg:gap-6">
           {Array.from({ length: 8 }).map((_, i) => (
             <div key={i} className="flex flex-col gap-3">
-              <div className="skeleton aspect-square w-full"></div>
+              <div className="skeleton aspect-[3/4] w-full rounded-box"></div>
               <div className="skeleton h-4 w-3/4"></div>
               <div className="skeleton h-3 w-1/2"></div>
             </div>

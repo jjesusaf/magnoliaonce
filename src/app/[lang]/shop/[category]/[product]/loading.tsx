@@ -15,7 +15,7 @@ export default function ProductLoading() {
         <div className="grid grid-cols-1 md:grid-cols-2 gap-8 lg:gap-16 max-w-6xl mx-auto">
           {/* Left: Gallery skeleton */}
           <div className="flex flex-col gap-3">
-            <div className="skeleton aspect-square w-full"></div>
+            <div className="skeleton aspect-[3/4] w-full rounded-box"></div>
             <div className="flex gap-2">
               {Array.from({ length: 4 }).map((_, i) => (
                 <div key={i} className="skeleton w-16 h-16 md:w-20 md:h-20 shrink-0"></div>

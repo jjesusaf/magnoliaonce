@@ -44,10 +44,11 @@ export default async function ProductPage({ params }: Props) {
   const categoryName = category ? localized(category, "name", lang) : catSlug;
   const description = localized(product, "description", lang);
 
-  // Build gallery images with URLs
+  // Build gallery images with URLs (3:4 portrait ratio for floral products)
   const galleryImages = (product.product_images ?? []).map((img) => ({
     id: img.id,
-    url: getImageUrl(BUCKET, img.storage_path, { width: 800, height: 800, resize: "cover" }) ?? "",
+    url: getImageUrl(BUCKET, img.storage_path, { width: 800, height: 1067, resize: "cover" }) ?? "",
+    fullUrl: getImageUrl(BUCKET, img.storage_path, { width: 1200, height: 1600, resize: "contain" }) ?? "",
     thumbUrl: getImageUrl(BUCKET, img.storage_path, { width: 200, height: 200, resize: "cover" }) ?? "",
     alt: localized(img, "alt", lang) || productName,
   }));

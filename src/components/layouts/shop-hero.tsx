@@ -19,7 +19,7 @@ export async function ShopHero({ lang }: Props) {
         {categories.map((cat) => {
           const name = localized(cat, "name", lang);
           const imageUrl = cat.image_path
-            ? getImageUrl(BUCKET, cat.image_path, { width: 600, height: 600, resize: "cover" })
+            ? getImageUrl(BUCKET, cat.image_path, { width: 600, height: 800, resize: "cover" })
             : null;
 
           return (
@@ -28,13 +28,13 @@ export async function ShopHero({ lang }: Props) {
               href={`/${lang}/shop/${cat.slug}`}
               className="group flex flex-col items-center"
             >
-              <div className="aspect-square w-full overflow-hidden bg-base-200">
+              <div className="aspect-[3/4] w-full overflow-hidden rounded-box bg-base-200">
                 {imageUrl && (
                   <Image
                     src={imageUrl}
                     alt={name}
                     width={600}
-                    height={600}
+                    height={800}
                     className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
                   />
                 )}
