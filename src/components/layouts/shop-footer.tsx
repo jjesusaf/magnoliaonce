@@ -16,10 +16,10 @@ type Props = {
 
 export function ShopFooter({ lang, dict }: Props) {
   const footerLinks = [
-    { label: dict.contact, href: `/${lang}/contact`, icon: Mail, enabled: false },
-    { label: dict.faq, href: `/${lang}/faq`, icon: CircleHelp, enabled: false },
-    { label: dict.privacy, href: `/${lang}/privacy`, icon: Shield, enabled: false },
-    { label: dict.terms, href: `/${lang}/terms`, icon: FileText, enabled: false },
+    { label: dict.contact, href: `/${lang}/contact`, icon: Mail, enabled: true },
+    { label: dict.faq, href: `/${lang}/faq`, icon: CircleHelp, enabled: true },
+    { label: dict.privacy, href: `/${lang}/privacy`, icon: Shield, enabled: true },
+    { label: dict.terms, href: `/${lang}/terms`, icon: FileText, enabled: true },
   ];
 
   return (
