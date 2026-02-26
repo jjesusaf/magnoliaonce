@@ -3,7 +3,7 @@
 import Image from "next/image";
 import { useEffect, useState } from "react";
 import { usePathname } from "next/navigation";
-import { Check, ShoppingBag, X } from "lucide-react";
+import { Check, X } from "lucide-react";
 import { useCart } from "@/lib/cart-context";
 import { formatPrice } from "@/lib/i18n-helpers";
 
@@ -30,69 +30,65 @@ export function CartToast() {
   if (!lastAdded) return null;
 
   return (
-    <div className="toast toast-top toast-end z-[80] pointer-events-none px-4 pt-20">
+    <div className="fixed top-20 right-4 z-80 pointer-events-none">
       <div
-        className={`pointer-events-auto w-80 sm:w-[22rem] bg-base-100 border border-base-200 rounded-xl shadow-xl transition-all duration-300 ease-out ${
+        className={`pointer-events-auto w-80 sm:w-90 bg-base-100 border border-base-content/10 shadow-lg transition-all duration-300 ease-out ${
           visible
-            ? "opacity-100 translate-y-0 scale-100"
-            : "opacity-0 -translate-y-2 scale-95"
+            ? "opacity-100 translate-y-0"
+            : "opacity-0 -translate-y-2"
         }`}
         role="alert"
       >
         {/* Header */}
-        <div className="flex items-center justify-between px-4 pt-3 pb-2">
+        <div className="flex items-center justify-between px-4 py-3 border-b border-base-content/10">
           <div className="flex items-center gap-2">
-            <div className="flex items-center justify-center w-5 h-5 rounded-full bg-success/15">
-              <Check className="h-3 w-3 text-success" strokeWidth={3} />
-            </div>
-            <span className="text-xs tracking-wider uppercase text-base-content/50 font-semibold">
+            <Check className="h-4 w-4" strokeWidth={2} />
+            <span className="text-xs tracking-widest uppercase">
               {isEs ? "Agregado al carrito" : "Added to cart"}
             </span>
           </div>
           <button
             onClick={dismissLastAdded}
-            className="btn btn-ghost btn-xs btn-circle text-base-content/30 hover:text-base-content/60"
+            className="p-0.5 hover:opacity-60 transition-opacity"
             aria-label="Dismiss"
           >
-            <X className="h-3.5 w-3.5" />
+            <X className="h-4 w-4" strokeWidth={1.5} />
           </button>
         </div>
 
         {/* Product info */}
-        <div className="flex items-center gap-3 px-4 pb-3">
-          <div className="relative w-12 h-14 shrink-0 rounded-lg overflow-hidden bg-base-200">
+        <div className="flex items-center gap-3 px-4 py-3">
+          <div className="relative w-14 h-14 shrink-0 overflow-hidden bg-base-200">
             {lastAdded.imageUrl ? (
               <Image
                 src={lastAdded.imageUrl}
                 alt={lastAdded.productName}
                 fill
                 className="object-cover"
-                sizes="48px"
+                sizes="56px"
               />
             ) : (
-              <div className="w-full h-full flex items-center justify-center">
-                <ShoppingBag className="h-4 w-4 text-base-content/30" />
-              </div>
+              <div className="w-full h-full bg-base-200" />
             )}
           </div>
           <div className="min-w-0 flex-1">
-            <p className="text-sm font-semibold text-base-content truncate">
+            <p className="text-sm tracking-wide uppercase truncate">
               {lastAdded.productName}
             </p>
-            <p className="text-xs text-base-content/50 truncate">
+            <p className="text-xs text-base-content/50 mt-0.5">
               {lastAdded.variantLabel}
             </p>
-            <p className="text-xs font-semibold text-primary mt-0.5">
+            <p className="text-sm mt-0.5">
               {formatPrice(lastAdded.price, lastAdded.currency)}
             </p>
           </div>
         </div>
 
         {/* Action */}
-        <div className="px-4 pb-3">
+        <div className="px-4 pb-4">
           <button
             onClick={handleViewCart}
-            className="btn btn-primary btn-sm btn-block tracking-wider uppercase"
+            className="w-full py-2.5 text-xs tracking-widest uppercase border border-base-content bg-base-content text-base-100 hover:bg-base-content/90 transition-colors"
           >
             {isEs ? "Ver carrito" : "View cart"}
           </button>

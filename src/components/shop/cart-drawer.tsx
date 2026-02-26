@@ -1,7 +1,7 @@
 "use client";
 
 import Image from "next/image";
-import { X, Minus, Plus, Trash2, ShoppingBag } from "lucide-react";
+import { X, Minus, Plus, Trash2 } from "lucide-react";
 import { useCart } from "@/lib/cart-context";
 import { formatPrice } from "@/lib/i18n-helpers";
 
@@ -24,138 +24,151 @@ export function CartDrawer({ lang, dict }: Props) {
     useCart();
 
   const currency = lang === "es" ? "MXN" : "USD";
+  const isEs = lang === "es";
+  const itemCount = items.reduce((sum, i) => sum + i.quantity, 0);
 
   return (
     <>
       {/* Overlay */}
       {isOpen && (
         <div
-          className="fixed inset-0 bg-black/40 z-[60] transition-opacity"
+          className="fixed inset-0 bg-black/40 z-60 transition-opacity"
           onClick={closeCart}
         />
       )}
 
       {/* Drawer panel */}
       <div
-        className={`fixed top-0 right-0 h-full w-80 sm:w-96 bg-base-100 z-[70] shadow-xl flex flex-col transition-transform duration-300 ease-in-out ${
+        className={`fixed top-0 right-0 h-full w-full sm:w-105 bg-base-100 z-70 shadow-xl flex flex-col transition-transform duration-300 ease-in-out ${
           isOpen ? "translate-x-0" : "translate-x-full"
         }`}
       >
         {/* Header */}
-        <div className="flex items-center justify-between px-6 py-4 border-b border-base-200">
-          <h2 className="text-sm tracking-widest uppercase font-bold">
-            {dict.title}
-          </h2>
+        <div className="flex items-center justify-between px-6 h-15 shrink-0">
+          <div className="flex items-center gap-3">
+            <h2 className="text-lg tracking-widest uppercase">
+              {dict.title}
+            </h2>
+            {itemCount > 0 && (
+              <span className="flex items-center justify-center w-6 h-6 rounded-full bg-base-content text-base-100 text-xs">
+                {itemCount}
+              </span>
+            )}
+          </div>
           <button
             onClick={closeCart}
-            className="btn btn-ghost btn-circle btn-sm"
+            className="p-1 hover:opacity-60 transition-opacity"
             aria-label="Close cart"
           >
-            <X className="h-5 w-5" />
+            <X className="h-5 w-5" strokeWidth={1.5} />
           </button>
         </div>
 
         {/* Items list */}
         {items.length === 0 ? (
-          <div className="flex-1 flex flex-col items-center justify-center gap-4 px-6 text-base-content/60">
-            <ShoppingBag className="h-12 w-12 stroke-[1]" />
+          <div className="flex-1 flex flex-col items-center justify-center gap-6 px-6 text-base-content/50">
             <p className="text-sm tracking-widest uppercase">{dict.empty}</p>
             <button
               onClick={closeCart}
-              className="btn btn-outline btn-sm tracking-widest uppercase"
+              className="px-6 py-2.5 text-sm tracking-widest uppercase border border-base-content/20 hover:border-base-content/50 transition-colors"
             >
               {dict.continueShopping}
             </button>
           </div>
         ) : (
           <>
-            <ul className="flex-1 overflow-y-auto divide-y divide-base-200">
-              {items.map((item) => (
-                <li key={item.variantId} className="flex gap-3 p-4">
-                  {/* Thumbnail */}
-                  <div className="relative w-16 h-20 shrink-0 rounded overflow-hidden bg-base-200">
-                    {item.imageUrl ? (
-                      <Image
-                        src={item.imageUrl}
-                        alt={item.productName}
-                        fill
-                        className="object-cover"
-                        sizes="64px"
-                      />
-                    ) : (
-                      <div className="w-full h-full flex items-center justify-center">
-                        <ShoppingBag className="h-6 w-6 text-base-content/30" />
-                      </div>
-                    )}
-                  </div>
+            <div className="flex-1 overflow-y-auto">
+              <div className="divide-y divide-base-200">
+                {items.map((item) => (
+                  <div key={item.variantId} className="flex gap-4 px-6 py-5">
+                    {/* Thumbnail — square like Midi */}
+                    <div className="relative w-18 h-18 shrink-0 overflow-hidden bg-base-200">
+                      {item.imageUrl ? (
+                        <Image
+                          src={item.imageUrl}
+                          alt={item.productName}
+                          fill
+                          className="object-cover"
+                          sizes="72px"
+                        />
+                      ) : (
+                        <div className="w-full h-full bg-base-200" />
+                      )}
+                    </div>
 
-                  {/* Details */}
-                  <div className="flex-1 min-w-0 flex flex-col justify-between">
-                    <div>
-                      <p className="text-sm font-semibold tracking-wide uppercase truncate">
+                    {/* Details */}
+                    <div className="flex-1 min-w-0 flex flex-col gap-1">
+                      <p className="text-sm tracking-wide uppercase truncate">
                         {item.productName}
                       </p>
-                      <p className="text-xs text-base-content/60 truncate">
+                      <p className="text-sm text-base-content/50">
                         {item.variantLabel}
                       </p>
-                    </div>
+                      <p className="text-sm">
+                        {formatPrice(item.price, item.currency)}
+                      </p>
 
-                    <div className="flex items-center justify-between mt-2">
-                      {/* Qty controls */}
-                      <div className="flex items-center gap-1">
+                      {/* Quantity + remove */}
+                      <div className="flex items-center justify-between mt-2">
+                        <div className="flex items-center border border-base-content/15">
+                          <button
+                            onClick={() =>
+                              updateQty(item.variantId, item.quantity - 1)
+                            }
+                            className="w-8 h-8 flex items-center justify-center hover:bg-base-200 transition-colors"
+                            aria-label="Decrease quantity"
+                          >
+                            <Minus className="h-3 w-3" />
+                          </button>
+                          <span className="w-8 h-8 flex items-center justify-center text-sm tabular-nums border-x border-base-content/15">
+                            {item.quantity}
+                          </span>
+                          <button
+                            onClick={() =>
+                              updateQty(item.variantId, item.quantity + 1)
+                            }
+                            className="w-8 h-8 flex items-center justify-center hover:bg-base-200 transition-colors"
+                            aria-label="Increase quantity"
+                          >
+                            <Plus className="h-3 w-3" />
+                          </button>
+                        </div>
+
                         <button
-                          onClick={() =>
-                            updateQty(item.variantId, item.quantity - 1)
-                          }
-                          className="btn btn-ghost btn-xs btn-circle"
-                          aria-label="Decrease quantity"
+                          onClick={() => removeItem(item.variantId)}
+                          className="p-1.5 hover:opacity-60 transition-opacity"
+                          aria-label={dict.remove}
                         >
-                          <Minus className="h-3 w-3" />
-                        </button>
-                        <span className="w-6 text-center text-sm tabular-nums">
-                          {item.quantity}
-                        </span>
-                        <button
-                          onClick={() =>
-                            updateQty(item.variantId, item.quantity + 1)
-                          }
-                          className="btn btn-ghost btn-xs btn-circle"
-                          aria-label="Increase quantity"
-                        >
-                          <Plus className="h-3 w-3" />
+                          <Trash2 className="h-4 w-4" strokeWidth={1.5} />
                         </button>
                       </div>
-
-                      {/* Price */}
-                      <span className="text-sm font-semibold">
-                        {formatPrice(item.price * item.quantity, item.currency)}
-                      </span>
                     </div>
-                  </div>
 
-                  {/* Remove */}
-                  <button
-                    onClick={() => removeItem(item.variantId)}
-                    className="btn btn-ghost btn-xs btn-circle self-start shrink-0"
-                    aria-label={dict.remove}
-                  >
-                    <Trash2 className="h-3.5 w-3.5" />
-                  </button>
-                </li>
-              ))}
-            </ul>
+                    {/* Line total */}
+                    <span className="text-sm shrink-0">
+                      {formatPrice(item.price * item.quantity, item.currency)}
+                    </span>
+                  </div>
+                ))}
+              </div>
+            </div>
 
             {/* Footer */}
-            <div className="border-t border-base-200 p-4 space-y-3">
+            <div className="shrink-0 px-6 py-5 border-t border-base-200 flex flex-col gap-4">
               <div className="flex items-center justify-between">
-                <span className="text-sm tracking-widest uppercase font-bold">
-                  {dict.total}
+                <span className="text-sm tracking-widest uppercase">
+                  {isEs ? "Total estimado" : "Estimated total"}
                 </span>
-                <span className="text-lg font-bold">
-                  {formatPrice(totalPrice, currency)}
+                <span className="text-base">
+                  {formatPrice(totalPrice, currency)} {currency}
                 </span>
               </div>
-              <button className="btn btn-primary btn-block tracking-widest uppercase">
+              <p className="text-xs text-base-content/40">
+                {isEs
+                  ? "Impuestos incluidos. Envío calculado al finalizar la compra."
+                  : "Duties and taxes included. Shipping is calculated at checkout."}
+              </p>
+              <button className="w-full py-3.5 text-sm tracking-widest uppercase bg-base-content text-base-100 hover:bg-base-content/90 transition-colors">
                 {dict.checkout}
               </button>
             </div>
