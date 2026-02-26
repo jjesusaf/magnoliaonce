@@ -6,6 +6,7 @@ import { getDictionary } from "@/lib/dictionaries";
 import { getCategory, getProductsByCategory } from "@/lib/queries";
 import { localized } from "@/lib/i18n-helpers";
 import { ProductCard } from "@/components/shop/product-card";
+import { FavoriteButton } from "@/components/shop/favorite-button";
 import { ShopFooter } from "@/components/layouts/shop-footer";
 
 type Props = {
@@ -61,13 +62,19 @@ export default async function CategoryPage({ params }: Props) {
         {/* Product grid */}
         <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 lg:gap-6">
           {products.map((product) => (
-            <ProductCard
-              key={product.id}
-              product={product}
-              categorySlug={slug}
-              lang={lang}
-              fromLabel={dict.shop.from}
-            />
+            <div key={product.id} className="relative group">
+              <ProductCard
+                product={product}
+                categorySlug={slug}
+                lang={lang}
+                fromLabel={dict.shop.from}
+              />
+              <FavoriteButton
+                productId={product.id}
+                lang={lang}
+                variant="card"
+              />
+            </div>
           ))}
         </div>
 

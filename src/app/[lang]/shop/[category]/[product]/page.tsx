@@ -8,6 +8,7 @@ import { localized } from "@/lib/i18n-helpers";
 import { getImageUrl } from "@/lib/storage";
 import { ProductGallery } from "@/components/shop/product-gallery";
 import { VariantPicker } from "@/components/shop/variant-picker";
+import { FavoriteButton } from "@/components/shop/favorite-button";
 import { ShopFooter } from "@/components/layouts/shop-footer";
 
 const BUCKET = "magnolia";
@@ -88,9 +89,16 @@ export default async function ProductPage({ params }: Props) {
 
           {/* Right: Details */}
           <div className="flex flex-col gap-6 md:sticky md:top-24 md:self-start">
-            <h1 className="text-2xl lg:text-3xl tracking-widest uppercase">
-              {productName}
-            </h1>
+            <div className="flex items-center gap-3">
+              <h1 className="text-2xl lg:text-3xl tracking-widest uppercase">
+                {productName}
+              </h1>
+              <FavoriteButton
+                productId={product.id}
+                lang={lang}
+                variant="detail"
+              />
+            </div>
 
             {description && (
               <div>

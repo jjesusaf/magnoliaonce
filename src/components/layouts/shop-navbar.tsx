@@ -2,13 +2,15 @@
 
 import Link from "next/link";
 import Image from "next/image";
-import { usePathname } from "next/navigation";
-import { User, ShoppingBag, Menu } from "lucide-react";
+import { usePathname, useRouter } from "next/navigation";
+import { User, ShoppingBag, Heart, Menu, LogOut } from "lucide-react";
 import { useRef } from "react";
 import type { Locale } from "@/lib/i18n";
 import { ThemeToggle } from "@/components/theme-toggle";
 import { useCart } from "@/lib/cart-context";
+import { useFavorites } from "@/lib/favorites-context";
 import { CartDrawer } from "@/components/shop/cart-drawer";
+import { useAuth } from "@/lib/auth-context";
 
 const DRAWER_ID = "shop-drawer";
 
@@ -45,8 +47,16 @@ export function ShopNavbar({ lang, nav, cartDict, children }: Props) {
   const pathname = usePathname();
   const otherLang = lang === "es" ? "en" : "es";
   const switchedPath = pathname.replace(`/${lang}`, `/${otherLang}`);
+  const router = useRouter();
   const drawerRef = useRef<HTMLInputElement>(null);
   const { totalItems, toggleCart } = useCart();
+  const { count: favCount } = useFavorites();
+  const { user, loading: authLoading, signOut } = useAuth();
+
+  const handleSignOut = async () => {
+    await signOut();
+    router.refresh();
+  };
 
   const links = [
     { label: nav.studio, href: `/${lang}/studio`, enabled: false },
@@ -192,9 +202,42 @@ export function ShopNavbar({ lang, nav, cartDict, children }: Props) {
             <ThemeToggle />
 
             {/* Account */}
-            <button className="btn btn-ghost btn-circle" aria-label="Account">
-              <User className="h-5 w-5 stroke-[1.5]" />
-            </button>
+            <Link
+              href={`/${lang}/login`}
+              className="btn btn-ghost btn-circle"
+              aria-label="Account"
+            >
+              {!authLoading && user ? (
+                <div className="avatar avatar-placeholder">
+                  <div className="bg-primary text-primary-content w-8 rounded-full">
+                    <span className="text-xs font-semibold">
+                      {(user.user_metadata?.full_name || user.user_metadata?.name || user.email || "U")
+                        .split(" ")
+                        .map((w: string) => w[0])
+                        .slice(0, 2)
+                        .join("")
+                        .toUpperCase()}
+                    </span>
+                  </div>
+                </div>
+              ) : (
+                <User className="h-5 w-5 stroke-[1.5]" />
+              )}
+            </Link>
+
+            {/* Favorites */}
+            <Link
+              href={`/${lang}/favorites`}
+              className="btn btn-ghost btn-circle relative"
+              aria-label="Favorites"
+            >
+              <Heart className="h-5 w-5 stroke-[1.5]" />
+              {favCount > 0 && (
+                <span className="badge badge-error badge-xs absolute -top-0.5 -right-0.5 text-[10px] min-w-[18px] h-[18px] p-0 flex items-center justify-center">
+                  {favCount}
+                </span>
+              )}
+            </Link>
 
             {/* Cart */}
             <button
@@ -284,33 +327,71 @@ export function ShopNavbar({ lang, nav, cartDict, children }: Props) {
           </ul>
 
           {/* Sidebar footer */}
-          <div className="p-4 border-t border-base-200 flex items-center justify-between">
-            <div className="flex items-center gap-1">
-              <button className="btn btn-ghost btn-circle" aria-label="Account">
-                <User className="h-5 w-5 stroke-[1.5]" />
-              </button>
-              <button
-                className="btn btn-ghost btn-circle relative"
-                aria-label="Cart"
-                onClick={() => { closeDrawer(); toggleCart(); }}
-              >
-                <ShoppingBag className="h-5 w-5 stroke-[1.5]" />
-                {totalItems > 0 && (
-                  <span className="badge badge-primary badge-xs absolute -top-0.5 -right-0.5 text-[10px] min-w-[18px] h-[18px] p-0 flex items-center justify-center">
-                    {totalItems}
-                  </span>
+          <div className="p-4 border-t border-base-200">
+            {/* User info row (if authenticated) */}
+            {!authLoading && user && (
+              <div className="flex items-center gap-3 mb-3 px-1">
+                <div className="avatar avatar-placeholder">
+                  <div className="bg-primary text-primary-content w-8 rounded-full">
+                    <span className="text-xs font-semibold">
+                      {(user.user_metadata?.full_name || user.user_metadata?.name || user.email || "U")
+                        .split(" ")
+                        .map((w: string) => w[0])
+                        .slice(0, 2)
+                        .join("")
+                        .toUpperCase()}
+                    </span>
+                  </div>
+                </div>
+                <div className="flex-1 min-w-0">
+                  <p className="text-sm font-medium truncate">
+                    {user.user_metadata?.full_name || user.email}
+                  </p>
+                </div>
+                <button
+                  onClick={() => { closeDrawer(); handleSignOut(); }}
+                  className="btn btn-ghost btn-sm btn-circle text-error"
+                  aria-label="Sign out"
+                >
+                  <LogOut className="h-4 w-4" />
+                </button>
+              </div>
+            )}
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-1">
+                {!user && (
+                  <Link
+                    href={`/${lang}/login`}
+                    onClick={closeDrawer}
+                    className="btn btn-ghost btn-circle"
+                    aria-label="Account"
+                  >
+                    <User className="h-5 w-5 stroke-[1.5]" />
+                  </Link>
                 )}
-              </button>
-            </div>
-            <div className="flex items-center gap-1">
-              <Link
-                href={switchedPath}
-                onClick={closeDrawer}
-                className="btn btn-ghost btn-sm uppercase font-bold text-xs"
-              >
-                {otherLang}
-              </Link>
-              <ThemeToggle />
+                <button
+                  className="btn btn-ghost btn-circle relative"
+                  aria-label="Cart"
+                  onClick={() => { closeDrawer(); toggleCart(); }}
+                >
+                  <ShoppingBag className="h-5 w-5 stroke-[1.5]" />
+                  {totalItems > 0 && (
+                    <span className="badge badge-primary badge-xs absolute -top-0.5 -right-0.5 text-[10px] min-w-[18px] h-[18px] p-0 flex items-center justify-center">
+                      {totalItems}
+                    </span>
+                  )}
+                </button>
+              </div>
+              <div className="flex items-center gap-1">
+                <Link
+                  href={switchedPath}
+                  onClick={closeDrawer}
+                  className="btn btn-ghost btn-sm uppercase font-bold text-xs"
+                >
+                  {otherLang}
+                </Link>
+                <ThemeToggle />
+              </div>
             </div>
           </div>
         </div>

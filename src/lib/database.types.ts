@@ -14,6 +14,35 @@ export type Database = {
   }
   magnolia: {
     Tables: {
+      favorites: {
+        Row: {
+          id: string
+          user_id: string
+          product_id: string
+          created_at: string
+        }
+        Insert: {
+          id?: string
+          user_id: string
+          product_id: string
+          created_at?: string
+        }
+        Update: {
+          id?: string
+          user_id?: string
+          product_id?: string
+          created_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "favorites_product_id_fkey"
+            columns: ["product_id"]
+            isOneToOne: false
+            referencedRelation: "products"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       categories: {
         Row: {
           created_at: string
