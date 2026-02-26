@@ -82,8 +82,15 @@ export function ShopNavbar({ lang, nav, cartDict, children }: Props) {
 
       {/* Main content: navbar + page */}
       <div className="drawer-content flex flex-col">
-        {/* Navbar */}
-        <div className="navbar fixed top-0 left-0 right-0 z-40 bg-base-100/80 backdrop-blur-xl border-b border-base-200 px-6 py-3 lg:px-10 lg:py-4 justify-evenly">
+        {/* Promo marquee — above navbar, only for guests */}
+        {!authLoading && !user && (
+          <div className="fixed top-0 left-0 right-0 z-50">
+            <PromoMarquee />
+          </div>
+        )}
+
+        {/* Navbar — shifts down when promo is visible */}
+        <div className={`navbar fixed left-0 right-0 z-40 bg-base-100/80 backdrop-blur-xl border-b border-base-200 px-6 py-3 lg:px-10 lg:py-4 justify-evenly ${!authLoading && !user ? "top-9" : "top-0"}`}>
           {/* Logo */}
           <div className="navbar-start items-center">
             <Link href={`/${lang}/shop`} className="shrink-0 flex items-center">
@@ -265,14 +272,8 @@ export function ShopNavbar({ lang, nav, cartDict, children }: Props) {
           </div>
         </div>
 
-        {/* Promo marquee — only for guests */}
-        {!authLoading && !user && (
-          <div className="fixed top-[57px] lg:top-[65px] left-0 right-0 z-30">
-            <PromoMarquee />
-          </div>
-        )}
-
-        {/* Page content */}
+        {/* Page content — extra spacer when promo marquee is visible */}
+        {!authLoading && !user && <div className="h-9 shrink-0" />}
         {children}
       </div>
 
