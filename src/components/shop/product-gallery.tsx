@@ -2,7 +2,7 @@
 
 import Image from "next/image";
 import { useState, useEffect, useCallback } from "react";
-import { X, ChevronLeft, ChevronRight, ZoomIn } from "lucide-react";
+import { X, ChevronLeft, ChevronRight } from "lucide-react";
 
 type GalleryImage = {
   id: string;
@@ -49,7 +49,7 @@ export function ProductGallery({ images }: Props) {
 
   if (images.length === 0) {
     return (
-      <div className="aspect-[3/4] w-full bg-base-200 rounded-box flex items-center justify-center">
+      <div className="aspect-4/5 w-full bg-base-200 flex items-center justify-center">
         <span className="text-base-content/40">No image</span>
       </div>
     );
@@ -59,50 +59,85 @@ export function ProductGallery({ images }: Props) {
 
   return (
     <>
-      <div className="flex flex-col gap-3">
+      <div className="flex flex-col gap-px">
         {/* Main image — clickable to open lightbox */}
         <button
           onClick={openLightbox}
-          className="relative aspect-[3/4] w-full overflow-hidden bg-base-200 rounded-box cursor-zoom-in group/img"
+          className="relative aspect-4/5 w-full overflow-hidden bg-base-200 cursor-zoom-in group/img"
           aria-label="View full image"
         >
           <Image
             src={main.url}
             alt={main.alt}
             width={800}
-            height={1067}
+            height={1000}
+            sizes="(min-width: 768px) 50vw, 100vw"
             className="h-full w-full object-cover transition-transform duration-500 group-hover/img:scale-[1.02]"
             priority
           />
-          {/* Zoom hint */}
-          <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover/img:opacity-100 transition-opacity duration-300">
-            <div className="bg-black/40 backdrop-blur-sm rounded-full p-3">
-              <ZoomIn className="h-5 w-5 text-white" />
-            </div>
-          </div>
+          {/* Navigation arrows on hover */}
+          {images.length > 1 && (
+            <>
+              <div
+                className="absolute left-3 top-1/2 -translate-y-1/2 z-10 opacity-0 group-hover/img:opacity-100 transition-opacity"
+                onClick={(e) => { e.stopPropagation(); goPrev(); }}
+                role="button"
+                tabIndex={0}
+                aria-label="Previous image"
+                onKeyDown={() => {}}
+              >
+                <ChevronLeft className="h-6 w-6 text-base-content/70" />
+              </div>
+              <div
+                className="absolute right-3 top-1/2 -translate-y-1/2 z-10 opacity-0 group-hover/img:opacity-100 transition-opacity"
+                onClick={(e) => { e.stopPropagation(); goNext(); }}
+                role="button"
+                tabIndex={0}
+                aria-label="Next image"
+                onKeyDown={() => {}}
+              >
+                <ChevronRight className="h-6 w-6 text-base-content/70" />
+              </div>
+            </>
+          )}
         </button>
 
         {/* Thumbnail strip */}
         {images.length > 1 && (
-          <div className="flex gap-2 overflow-x-auto pb-1">
+          <div className="hidden md:flex gap-px overflow-x-auto">
             {images.map((img, i) => (
               <button
                 key={img.id}
                 onClick={() => setSelected(i)}
-                className={`shrink-0 w-16 h-16 md:w-20 md:h-20 overflow-hidden rounded-lg border-2 transition-all ${
-                  i === selected
-                    ? "border-base-content ring-1 ring-base-content/20"
-                    : "border-transparent hover:border-base-content/30"
+                className={`shrink-0 w-18 overflow-hidden transition-opacity ${
+                  i === selected ? "opacity-100" : "opacity-50 hover:opacity-80"
                 }`}
+                style={{ aspectRatio: "4/5" }}
               >
                 <Image
                   src={img.thumbUrl}
                   alt={img.alt}
-                  width={200}
-                  height={200}
+                  width={72}
+                  height={90}
                   className="h-full w-full object-cover"
                 />
               </button>
+            ))}
+          </div>
+        )}
+
+        {/* Mobile dots */}
+        {images.length > 1 && (
+          <div className="flex md:hidden gap-1.5 justify-center py-3">
+            {images.map((_, i) => (
+              <button
+                key={i}
+                onClick={() => setSelected(i)}
+                className={`w-2 h-2 rounded-full transition-colors ${
+                  i === selected ? "bg-base-content" : "bg-base-content/25"
+                }`}
+                aria-label={`Image ${i + 1}`}
+              />
             ))}
           </div>
         )}
@@ -111,7 +146,7 @@ export function ProductGallery({ images }: Props) {
       {/* ─── Lightbox overlay ─── */}
       {lightboxOpen && (
         <div
-          className="fixed inset-0 z-[100] flex flex-col bg-black/95 animate-in fade-in duration-200"
+          className="fixed inset-0 z-100 flex flex-col bg-black/95 animate-in fade-in duration-200"
           role="dialog"
           aria-modal="true"
           aria-label="Image viewer"
@@ -133,10 +168,9 @@ export function ProductGallery({ images }: Props) {
 
           {/* Image area */}
           <div className="flex-1 flex items-center justify-center relative min-h-0 px-4 pb-4">
-            {/* Prev arrow */}
             {images.length > 1 && (
               <button
-                onClick={goPrev}
+                onClick={(e) => { e.stopPropagation(); goPrev(); }}
                 className="absolute left-2 lg:left-6 z-10 btn btn-circle btn-sm lg:btn-md bg-white/10 hover:bg-white/20 border-0 text-white"
                 aria-label="Previous image"
               >
@@ -144,22 +178,20 @@ export function ProductGallery({ images }: Props) {
               </button>
             )}
 
-            {/* Full image — object-contain to show the whole image */}
             {/* eslint-disable-next-line jsx-a11y/click-events-have-key-events, jsx-a11y/no-noninteractive-element-interactions */}
             <Image
               src={main.fullUrl}
               alt={main.alt}
               width={1200}
-              height={1600}
-              className="max-h-full max-w-full object-contain rounded-lg select-none"
+              height={1500}
+              className="max-h-full max-w-full object-contain select-none"
               priority
               onClick={(e) => e.stopPropagation()}
             />
 
-            {/* Next arrow */}
             {images.length > 1 && (
               <button
-                onClick={goNext}
+                onClick={(e) => { e.stopPropagation(); goNext(); }}
                 className="absolute right-2 lg:right-6 z-10 btn btn-circle btn-sm lg:btn-md bg-white/10 hover:bg-white/20 border-0 text-white"
                 aria-label="Next image"
               >
@@ -175,7 +207,7 @@ export function ProductGallery({ images }: Props) {
                 <button
                   key={img.id}
                   onClick={() => setSelected(i)}
-                  className={`shrink-0 w-12 h-12 md:w-14 md:h-14 overflow-hidden rounded-md border-2 transition-all ${
+                  className={`shrink-0 w-12 h-12 md:w-14 md:h-14 overflow-hidden border-2 transition-all ${
                     i === selected
                       ? "border-white ring-1 ring-white/30 opacity-100"
                       : "border-transparent opacity-50 hover:opacity-80"

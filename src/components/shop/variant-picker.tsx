@@ -3,6 +3,7 @@
 import { useState, useEffect } from "react";
 import { formatPrice, currencyForLang } from "@/lib/i18n-helpers";
 import { useCart } from "@/lib/cart-context";
+import { ShoppingBag, Check } from "lucide-react";
 
 type Variant = {
   id: string;
@@ -71,11 +72,20 @@ export function VariantPicker({
   if (filtered.length === 0) return null;
 
   return (
-    <div className="space-y-6">
-      <p className="text-sm tracking-widest uppercase text-base-content/60">
+    <div className="flex flex-col gap-5">
+      {/* Price display */}
+      {selected && (
+        <p className="text-xl tracking-wide">
+          {formatPrice(selected.price, selected.currency)}
+        </p>
+      )}
+
+      {/* Variant label */}
+      <p className="text-sm tracking-widest uppercase text-base-content/50">
         {dict.selectVariant}
       </p>
 
+      {/* Variant buttons */}
       <div className="flex flex-wrap gap-2">
         {filtered.map((v) => {
           const isSelected = v.id === selectedId;
@@ -85,9 +95,11 @@ export function VariantPicker({
               key={v.id}
               disabled={disabled}
               onClick={() => setSelectedId(v.id)}
-              className={`btn btn-sm ${
-                isSelected ? "btn-primary" : "btn-outline"
-              } ${disabled ? "btn-disabled line-through opacity-50" : ""}`}
+              className={`px-4 py-2 text-sm tracking-wide border transition-colors ${
+                isSelected
+                  ? "border-base-content bg-base-content text-base-100"
+                  : "border-base-content/20 hover:border-base-content/50"
+              } ${disabled ? "opacity-30 line-through cursor-not-allowed" : ""}`}
             >
               {v.label} — {formatPrice(v.price, v.currency)}
             </button>
@@ -95,17 +107,26 @@ export function VariantPicker({
         })}
       </div>
 
+      {/* Add to cart */}
       {!hideCart && (
         <button
           disabled={!selected || !selected.is_available || allSoldOut}
           onClick={handleAdd}
-          className="btn btn-primary btn-block tracking-widest uppercase"
+          className="flex items-center justify-center gap-2 w-full py-3.5 text-sm tracking-widest uppercase border border-base-content bg-base-content text-base-100 hover:bg-base-content/90 disabled:opacity-30 disabled:cursor-not-allowed transition-colors"
         >
-          {allSoldOut
-            ? dict.soldOut
-            : showAdded
-              ? addedLabel ?? "✓"
-              : dict.addToCart}
+          {allSoldOut ? (
+            dict.soldOut
+          ) : showAdded ? (
+            <>
+              <Check className="h-4 w-4" />
+              {addedLabel ?? "Added"}
+            </>
+          ) : (
+            <>
+              <ShoppingBag className="h-4 w-4" />
+              {dict.addToCart}
+            </>
+          )}
         </button>
       )}
     </div>

@@ -44,54 +44,52 @@ export default async function ProductPage({ params }: Props) {
   const categoryName = category ? localized(category, "name", lang) : catSlug;
   const description = localized(product, "description", lang);
 
-  // Build gallery images with URLs (3:4 portrait ratio for floral products)
+  // Build gallery images with URLs (4:5 portrait ratio)
   const galleryImages = (product.product_images ?? []).map((img) => ({
     id: img.id,
-    url: getImageUrl(BUCKET, img.storage_path, { width: 800, height: 1067, resize: "cover" }) ?? "",
-    fullUrl: getImageUrl(BUCKET, img.storage_path, { width: 1200, height: 1600, resize: "contain" }) ?? "",
-    thumbUrl: getImageUrl(BUCKET, img.storage_path, { width: 200, height: 200, resize: "cover" }) ?? "",
+    url: getImageUrl(BUCKET, img.storage_path, { width: 800, height: 1000, resize: "cover" }) ?? "",
+    fullUrl: getImageUrl(BUCKET, img.storage_path, { width: 1200, height: 1500, resize: "contain" }) ?? "",
+    thumbUrl: getImageUrl(BUCKET, img.storage_path, { width: 200, height: 250, resize: "cover" }) ?? "",
     alt: localized(img, "alt", lang) || productName,
   }));
 
   return (
     <main className="pt-16 pb-28 lg:pb-0 flex flex-col min-h-dvh">
-      <section className="flex-1 px-6 py-8 lg:px-16 lg:py-12">
-        {/* Breadcrumbs */}
-        <div className="breadcrumbs text-sm mb-8">
-          <ul>
-            <li>
-              <Link
-                href={`/${lang}/shop`}
-                className="tracking-widest uppercase text-base-content/60 hover:text-base-content transition-colors"
-              >
-                {dict.nav.shop}
-              </Link>
-            </li>
-            <li>
-              <Link
-                href={`/${lang}/shop/${catSlug}`}
-                className="tracking-widest uppercase text-base-content/60 hover:text-base-content transition-colors"
-              >
-                {categoryName}
-              </Link>
-            </li>
-            <li>
-              <span className="tracking-widest uppercase text-base-content">
-                {productName}
-              </span>
-            </li>
-          </ul>
-        </div>
-
-        {/* Product layout */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-8 lg:gap-16 max-w-6xl mx-auto">
+      <section className="flex-1 px-4 py-8 md:px-8 lg:px-12 lg:py-10">
+        {/* Product layout — two columns */}
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-8 lg:gap-16 max-w-7xl mx-auto">
           {/* Left: Gallery */}
-          <ProductGallery images={galleryImages} />
+          <div className="md:sticky md:top-24 md:self-start">
+            <ProductGallery images={galleryImages} />
+          </div>
 
           {/* Right: Details */}
-          <div className="flex flex-col gap-6 md:sticky md:top-24 md:self-start">
-            <div className="flex items-center gap-3">
-              <h1 className="text-2xl lg:text-3xl tracking-widest uppercase">
+          <div className="flex flex-col gap-5 md:pt-2">
+            {/* Breadcrumbs */}
+            <div className="breadcrumbs text-sm">
+              <ul>
+                <li>
+                  <Link
+                    href={`/${lang}/shop`}
+                    className="tracking-widest uppercase text-base-content/50 hover:text-base-content transition-colors"
+                  >
+                    {dict.nav.shop}
+                  </Link>
+                </li>
+                <li>
+                  <Link
+                    href={`/${lang}/shop/${catSlug}`}
+                    className="tracking-widest uppercase text-base-content/50 hover:text-base-content transition-colors"
+                  >
+                    {categoryName}
+                  </Link>
+                </li>
+              </ul>
+            </div>
+
+            {/* Title + favorite */}
+            <div className="flex items-start justify-between gap-3">
+              <h1 className="text-2xl lg:text-3xl tracking-widest uppercase leading-tight">
                 {productName}
               </h1>
               <FavoriteButton
@@ -101,17 +99,14 @@ export default async function ProductPage({ params }: Props) {
               />
             </div>
 
+            {/* Description */}
             {description && (
-              <div>
-                <h2 className="text-sm tracking-widest uppercase text-base-content/60 mb-2">
-                  {dict.shop.description}
-                </h2>
-                <p className="text-base-content/80 leading-relaxed">
-                  {description}
-                </p>
-              </div>
+              <p className="text-base-content/70 leading-relaxed">
+                {description}
+              </p>
             )}
 
+            {/* Variants + Add to cart */}
             <VariantPicker
               variants={product.product_variants ?? []}
               lang={lang}
@@ -123,9 +118,10 @@ export default async function ProductPage({ params }: Props) {
               categorySlug={catSlug}
             />
 
+            {/* Back link */}
             <Link
               href={`/${lang}/shop/${catSlug}`}
-              className="text-sm tracking-widest uppercase text-base-content/60 hover:text-base-content transition-colors mt-4"
+              className="text-sm tracking-widest uppercase text-base-content/50 hover:text-base-content transition-colors mt-2"
             >
               &larr; {dict.shop.backToCollection}
             </Link>

@@ -21,7 +21,7 @@ type Props = {
 export function ProductCard({ product, categorySlug, lang, fromLabel }: Props) {
   const name = localized(product, "name", lang);
   const image = product.product_images[0];
-  const imageUrl = image ? getImageUrl(BUCKET, image.storage_path, { width: 600, height: 800, resize: "cover" }) : null;
+  const imageUrl = image ? getImageUrl(BUCKET, image.storage_path, { width: 800, height: 1000, resize: "cover" }) : null;
   const alt = image ? localized(image, "alt", lang) || name : name;
 
   // Filter variants by lang currency and find the cheapest
@@ -34,25 +34,26 @@ export function ProductCard({ product, categorySlug, lang, fromLabel }: Props) {
   return (
     <Link
       href={`/${lang}/shop/${categorySlug}/${product.slug}`}
-      className="group flex flex-col"
+      className="group flex flex-col gap-3"
     >
-      <div className="aspect-[3/4] w-full overflow-hidden rounded-box bg-base-200">
+      <div className="aspect-4/5 w-full overflow-hidden bg-base-200">
         {imageUrl && (
           <Image
             src={imageUrl}
             alt={alt}
-            width={600}
-            height={800}
+            width={800}
+            height={1000}
+            sizes="(min-width: 1024px) 25vw, (min-width: 768px) 33vw, 50vw"
             className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
           />
         )}
       </div>
-      <div className="mt-3 space-y-1">
-        <h3 className="text-sm tracking-widest uppercase text-base-content/80 group-hover:text-base-content transition-colors">
+      <div className="flex flex-col items-center gap-1">
+        <h3 className="text-sm tracking-widest uppercase text-base-content/80 group-hover:text-base-content transition-colors text-center">
           {name}
         </h3>
         {cheapest && (
-          <p className="text-sm text-base-content/60">
+          <p className="text-sm text-base-content/50">
             {fromLabel} {formatPrice(cheapest.price, cheapest.currency)}
           </p>
         )}

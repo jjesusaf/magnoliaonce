@@ -31,12 +31,14 @@ export default async function CategoryPage({ params }: Props) {
 
   const products = await getProductsByCategory(category.id);
   const categoryName = localized(category, "name", lang);
+  const categoryDesc = localized(category, "description", lang);
 
   return (
     <main className="pt-16 pb-28 lg:pb-0 flex flex-col min-h-dvh">
-      <section className="flex-1 px-6 py-8 lg:px-16 lg:py-12">
+      {/* Header section */}
+      <section className="px-6 pt-10 pb-6 lg:px-16 lg:pt-14 lg:pb-8 flex flex-col gap-6">
         {/* Breadcrumbs */}
-        <div className="breadcrumbs text-sm mb-8">
+        <div className="breadcrumbs text-sm">
           <ul>
             <li>
               <Link
@@ -55,12 +57,21 @@ export default async function CategoryPage({ params }: Props) {
         </div>
 
         {/* Category title */}
-        <h1 className="text-2xl lg:text-3xl tracking-widest uppercase mb-8 lg:mb-12">
+        <h1 className="text-3xl lg:text-4xl tracking-widest uppercase">
           {categoryName}
         </h1>
 
-        {/* Product grid */}
-        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 lg:gap-6">
+        {/* Category description */}
+        {categoryDesc && (
+          <p className="text-sm lg:text-base leading-relaxed tracking-wide uppercase text-base-content/70 max-w-3xl">
+            {categoryDesc}
+          </p>
+        )}
+      </section>
+
+      {/* Product grid */}
+      <section className="flex-1 px-4 pb-8 lg:px-16 lg:pb-12">
+        <div className="grid grid-cols-2 md:grid-cols-3 gap-3 md:gap-4">
           {products.map((product) => (
             <div key={product.id} className="relative group">
               <ProductCard
