@@ -42,25 +42,23 @@ export default async function ContactPage({
 
   return (
     <InfoPageShell lang={lang} current="contact">
-      {/* Badge */}
-      <span className="inline-block text-[11px] tracking-widest uppercase text-primary/80 font-semibold mb-4">
-        {es ? "Hablemos" : "Get in Touch"}
-      </span>
-
       {/* Title */}
-      <h1 className="text-3xl md:text-4xl font-semibold text-base-content leading-tight">
+      <p className="text-xs tracking-widest uppercase text-base-content/40 mb-3">
+        {es ? "Hablemos" : "Get in Touch"}
+      </p>
+      <h1 className="text-2xl md:text-3xl tracking-widest uppercase leading-tight">
         {es ? "Contacto" : "Contact"}
       </h1>
 
       {/* Subtitle */}
-      <p className="text-sm text-base-content/50 mt-2 mb-10 max-w-md">
+      <p className="text-sm text-base-content/50 mt-3 mb-10 max-w-md leading-relaxed">
         {es
           ? "Estamos aquí para ayudarte. Elige el canal que prefieras y te responderemos lo antes posible."
           : "We're here to help. Choose your preferred channel and we'll get back to you as soon as possible."}
       </p>
 
       {/* Contact channels */}
-      <div className="space-y-4">
+      <div className="space-y-3">
         {channels.map((ch) => {
           const Icon = ch.icon;
           return (
@@ -69,19 +67,19 @@ export default async function ContactPage({
               href={ch.href}
               target={ch.href.startsWith("http") ? "_blank" : undefined}
               rel={ch.href.startsWith("http") ? "noopener noreferrer" : undefined}
-              className="group flex items-start gap-4 p-5 rounded-xl border border-base-200 hover:border-primary/30 hover:bg-base-200/40 transition-all"
+              className="group flex items-start gap-4 p-5 border border-base-content/10 hover:border-base-content/25 transition-colors"
             >
-              <div className="flex items-center justify-center w-10 h-10 rounded-full bg-primary/10 text-primary shrink-0 group-hover:bg-primary/20 transition-colors">
-                <Icon className="h-5 w-5" />
+              <div className="flex items-center justify-center w-10 h-10 bg-base-200 shrink-0">
+                <Icon className="h-5 w-5 text-base-content/50" strokeWidth={1.5} />
               </div>
               <div className="min-w-0">
-                <p className="text-xs tracking-wider uppercase text-base-content/40 mb-0.5">
+                <p className="text-xs tracking-widest uppercase text-base-content/40 mb-0.5">
                   {ch.label}
                 </p>
-                <p className="text-sm font-medium text-base-content group-hover:text-primary transition-colors">
+                <p className="text-sm text-base-content group-hover:text-base-content/80 transition-colors">
                   {ch.value}
                 </p>
-                <p className="text-xs text-base-content/50 mt-1">
+                <p className="text-xs text-base-content/50 mt-1 leading-relaxed">
                   {ch.description}
                 </p>
               </div>
@@ -91,12 +89,12 @@ export default async function ContactPage({
       </div>
 
       {/* Location & Hours */}
-      <div className="grid md:grid-cols-2 gap-4 mt-8">
+      <div className="grid md:grid-cols-2 gap-3 mt-8">
         {/* Location */}
-        <div className="p-5 rounded-xl border border-base-200">
+        <div className="p-5 border border-base-content/10">
           <div className="flex items-center gap-2.5 mb-3">
-            <MapPin className="h-4 w-4 text-primary/60" />
-            <h2 className="text-xs tracking-wider uppercase text-base-content/40 font-semibold">
+            <MapPin className="h-4 w-4 text-base-content/40" strokeWidth={1.5} />
+            <h2 className="text-xs tracking-widest uppercase text-base-content/40">
               {es ? "Ubicación" : "Location"}
             </h2>
           </div>
@@ -108,10 +106,10 @@ export default async function ContactPage({
         </div>
 
         {/* Hours */}
-        <div className="p-5 rounded-xl border border-base-200">
+        <div className="p-5 border border-base-content/10">
           <div className="flex items-center gap-2.5 mb-3">
-            <Clock className="h-4 w-4 text-primary/60" />
-            <h2 className="text-xs tracking-wider uppercase text-base-content/40 font-semibold">
+            <Clock className="h-4 w-4 text-base-content/40" strokeWidth={1.5} />
+            <h2 className="text-xs tracking-widest uppercase text-base-content/40">
               {es ? "Horario" : "Hours"}
             </h2>
           </div>
@@ -135,7 +133,7 @@ export default async function ContactPage({
       </div>
 
       {/* FAQ CTA */}
-      <div className="mt-12 text-center py-8 border-t border-base-200">
+      <div className="mt-12 text-center py-8 border-t border-base-content/10">
         <p className="text-sm text-base-content/50 mb-4">
           {es
             ? "¿Tienes preguntas frecuentes? Consulta nuestro FAQ."
@@ -143,7 +141,7 @@ export default async function ContactPage({
         </p>
         <Link
           href={`/${lang}/faq`}
-          className="btn btn-outline btn-sm tracking-wider uppercase"
+          className="inline-block px-6 py-2.5 text-xs tracking-widest uppercase border border-base-content hover:bg-base-content hover:text-base-100 transition-colors"
         >
           {es ? "Ver FAQ" : "View FAQ"}
         </Link>

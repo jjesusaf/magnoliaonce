@@ -85,21 +85,21 @@ function CouponCard({
 
   return (
     <div
-      className={`relative overflow-hidden rounded-xl border-2 border-dashed ${
+      className={`relative overflow-hidden border-2 border-dashed p-5 ${
         inactive
-          ? "border-base-300 bg-base-200/50 opacity-60"
-          : "border-primary/30 bg-primary/5"
-      } p-5`}
+          ? "border-base-content/10 bg-base-200/50 opacity-60"
+          : "border-base-content/20 bg-base-200/30"
+      }`}
     >
       <div className="flex items-start justify-between gap-3">
         <div>
           <div className="flex items-center gap-2 mb-1">
-            <Ticket className="h-4 w-4 text-primary" />
-            <span className="text-xs tracking-wider uppercase text-base-content/50 font-semibold">
+            <Ticket className="h-4 w-4 text-base-content/50" strokeWidth={1.5} />
+            <span className="text-xs tracking-widest uppercase text-base-content/50">
               {isEs ? "Tu cupón de bienvenida" : "Your welcome coupon"}
             </span>
           </div>
-          <p className="text-2xl font-bold text-primary">{discount}% OFF</p>
+          <p className="text-2xl tracking-widest uppercase">{discount}% OFF</p>
           <p className="text-xs text-base-content/40 mt-1">
             {isRedeemed
               ? isEs
@@ -119,10 +119,10 @@ function CouponCard({
       {/* Code */}
       <div className="mt-4 flex items-center gap-2">
         <code
-          className={`flex-1 text-center text-sm font-mono font-bold tracking-widest py-2 px-3 rounded-lg ${
+          className={`flex-1 text-center text-sm font-mono tracking-widest py-2 px-3 ${
             inactive
-              ? "bg-base-300/50 text-base-content/40 line-through"
-              : "bg-base-100 text-base-content"
+              ? "bg-base-200/50 text-base-content/40 line-through"
+              : "bg-base-100 text-base-content border border-base-content/10"
           }`}
         >
           {code}
@@ -130,20 +130,20 @@ function CouponCard({
         {!inactive && (
           <button
             onClick={handleCopy}
-            className="btn btn-ghost btn-sm btn-square"
+            className="p-2 hover:opacity-60 transition-opacity"
             aria-label="Copy code"
           >
             {copied ? (
-              <Check className="h-4 w-4 text-success" />
+              <Check className="h-4 w-4" strokeWidth={1.5} />
             ) : (
-              <Copy className="h-4 w-4" />
+              <Copy className="h-4 w-4" strokeWidth={1.5} />
             )}
           </button>
         )}
       </div>
 
       {/* Expiry */}
-      <p className="text-[11px] text-base-content/30 mt-3">
+      <p className="text-xs text-base-content/30 mt-3">
         {inactive
           ? isEs
             ? `Expiró el ${expiryLabel}`
@@ -249,7 +249,7 @@ function LoginForm({ lang }: { lang: string }) {
   if (loading) {
     return (
       <div className="min-h-dvh flex items-center justify-center bg-base-100">
-        <span className="loading loading-spinner loading-lg text-primary" />
+        <span className="loading loading-spinner loading-lg" />
       </div>
     );
   }
@@ -308,14 +308,14 @@ function LoginForm({ lang }: { lang: string }) {
     return (
       <div className="min-h-dvh bg-base-100 flex flex-col">
         {/* Sticky header */}
-        <header className="sticky top-0 z-40 bg-base-100/80 backdrop-blur-xl border-b border-base-200">
+        <header className="sticky top-0 z-40 bg-base-100/80 backdrop-blur-xl border-b border-base-content/10">
           <div className="max-w-lg mx-auto flex items-center gap-4 px-6 py-3">
             <Link
               href={`/${lang}/shop`}
-              className="btn btn-ghost btn-sm btn-circle"
+              className="p-1.5 hover:opacity-60 transition-opacity"
               aria-label={isEs ? "Volver" : "Back"}
             >
-              <ArrowLeft className="h-4 w-4" />
+              <ArrowLeft className="h-4 w-4" strokeWidth={1.5} />
             </Link>
             <div className="logo-stack grid">
               <Image
@@ -339,16 +339,16 @@ function LoginForm({ lang }: { lang: string }) {
         {/* Profile hero */}
         <div className="max-w-lg w-full mx-auto px-6 pt-10 pb-8">
           <div className="flex items-center gap-5">
-            <div className="avatar avatar-placeholder shrink-0">
-              <div className="bg-primary text-primary-content w-16 rounded-full">
-                <span className="text-xl font-semibold">{initials}</span>
-              </div>
+            <div className="w-16 h-16 shrink-0 bg-base-content flex items-center justify-center">
+              <span className="text-xl tracking-widest text-base-100">
+                {initials}
+              </span>
             </div>
             <div className="min-w-0">
-              <p className="text-xs text-base-content/40 tracking-wider uppercase mb-0.5">
+              <p className="text-xs text-base-content/40 tracking-widest uppercase mb-0.5">
                 {greeting}
               </p>
-              <h1 className="text-xl font-semibold text-base-content truncate">
+              <h1 className="text-xl tracking-widest uppercase truncate">
                 {firstName}
               </h1>
               {email && (
@@ -364,13 +364,13 @@ function LoginForm({ lang }: { lang: string }) {
         <div className="max-w-lg w-full mx-auto px-6">
           <div className="flex items-center gap-3 flex-wrap">
             {provider && (
-              <span className="badge badge-soft badge-sm gap-1.5">
+              <span className="text-xs tracking-widest uppercase text-base-content/40 px-3 py-1.5 border border-base-content/10">
                 {isEs ? "Sesión con" : "Signed in with"}{" "}
                 {PROVIDER_LABELS[provider] ?? provider}
               </span>
             )}
             {memberSince && (
-              <span className="badge badge-ghost badge-sm gap-1.5">
+              <span className="text-xs tracking-widest uppercase text-base-content/40 px-3 py-1.5 border border-base-content/10">
                 {isEs ? "Miembro desde" : "Member since"} {memberSince}
               </span>
             )}
@@ -381,7 +381,7 @@ function LoginForm({ lang }: { lang: string }) {
         <div className="max-w-lg w-full mx-auto px-6 mt-6">
           {couponLoading ? (
             <div className="flex items-center justify-center py-8">
-              <span className="loading loading-dots loading-sm text-primary" />
+              <span className="loading loading-dots loading-sm" />
             </div>
           ) : coupon ? (
             <CouponCard
@@ -396,12 +396,12 @@ function LoginForm({ lang }: { lang: string }) {
 
         {/* Divider */}
         <div className="max-w-lg w-full mx-auto px-6">
-          <div className="border-b border-base-200 mt-8 mb-2" />
+          <div className="border-b border-base-content/10 mt-8 mb-2" />
         </div>
 
         {/* Account links */}
         <nav className="max-w-lg w-full mx-auto px-6">
-          <p className="text-[11px] tracking-widest uppercase text-base-content/30 font-semibold px-1 py-3">
+          <p className="text-xs tracking-widest uppercase text-base-content/30 px-1 py-3">
             {isEs ? "Información" : "Information"}
           </p>
           <ul className="space-y-0.5">
@@ -411,13 +411,13 @@ function LoginForm({ lang }: { lang: string }) {
                 <li key={link.href}>
                   <Link
                     href={link.href}
-                    className="flex items-center gap-3 px-1 py-3 rounded-lg hover:bg-base-200/50 transition-colors group"
+                    className="flex items-center gap-3 px-1 py-3 hover:bg-base-200/50 transition-colors group"
                   >
-                    <Icon className="h-[18px] w-[18px] text-base-content/30 group-hover:text-base-content/50 transition-colors" />
+                    <Icon className="h-4.5 w-4.5 text-base-content/30 group-hover:text-base-content/50 transition-colors" strokeWidth={1.5} />
                     <span className="flex-1 text-sm text-base-content/70 group-hover:text-base-content transition-colors">
                       {link.label}
                     </span>
-                    <ChevronRight className="h-4 w-4 text-base-content/20 group-hover:text-base-content/40 transition-colors" />
+                    <ChevronRight className="h-4 w-4 text-base-content/20 group-hover:text-base-content/40 transition-colors" strokeWidth={1.5} />
                   </Link>
                 </li>
               );
@@ -429,9 +429,9 @@ function LoginForm({ lang }: { lang: string }) {
         <div className="max-w-lg w-full mx-auto px-6 mt-auto pb-10 pt-8">
           <button
             onClick={handleSignOut}
-            className="flex items-center justify-center gap-2 w-full py-3 rounded-lg text-sm text-error/60 hover:text-error hover:bg-error/5 transition-colors"
+            className="flex items-center justify-center gap-2 w-full py-3 text-sm tracking-widest uppercase text-base-content/40 hover:text-base-content border border-base-content/10 hover:border-base-content/25 transition-colors"
           >
-            <LogOut className="h-4 w-4" />
+            <LogOut className="h-4 w-4" strokeWidth={1.5} />
             {isEs ? "Cerrar sesión" : "Sign out"}
           </button>
         </div>
@@ -446,10 +446,10 @@ function LoginForm({ lang }: { lang: string }) {
       <div className="flex items-center p-6">
         <Link
           href={`/${lang}/shop`}
-          className="btn btn-ghost btn-sm gap-2 text-base-content/60 hover:text-base-content"
+          className="flex items-center gap-2 text-base-content/50 hover:text-base-content transition-colors"
         >
-          <ArrowLeft className="h-4 w-4" />
-          <span className="text-xs tracking-wider uppercase">
+          <ArrowLeft className="h-4 w-4" strokeWidth={1.5} />
+          <span className="text-xs tracking-widest uppercase">
             {isEs ? "Volver a tienda" : "Back to shop"}
           </span>
         </Link>
@@ -480,7 +480,7 @@ function LoginForm({ lang }: { lang: string }) {
 
           {/* Heading */}
           <div className="text-center mb-8">
-            <h1 className="text-2xl font-semibold text-base-content tracking-tight">
+            <h1 className="text-2xl tracking-widest uppercase">
               {isEs ? "Bienvenida" : "Welcome"}
             </h1>
             <p className="text-base-content/50 text-sm mt-2">
@@ -492,8 +492,8 @@ function LoginForm({ lang }: { lang: string }) {
 
           {/* Promo badge */}
           <div className="flex justify-center mb-6">
-            <span className="badge badge-primary badge-soft gap-1.5 text-xs">
-              <Ticket className="h-3 w-3" />
+            <span className="flex items-center gap-1.5 text-xs tracking-widest uppercase text-base-content/50 px-3 py-1.5 border border-base-content/10">
+              <Ticket className="h-3 w-3" strokeWidth={1.5} />
               {isEs
                 ? "30% de descuento en tu primera compra"
                 : "30% off your first purchase"}
@@ -502,26 +502,10 @@ function LoginForm({ lang }: { lang: string }) {
 
           {/* Error */}
           {error && (
-            <div role="alert" className="alert alert-error alert-soft text-sm mb-6">
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                className="h-5 w-5 shrink-0"
-                fill="none"
-                viewBox="0 0 24 24"
-                stroke="currentColor"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L4.082 16.5c-.77.833.192 2.5 1.732 2.5z"
-                />
-              </svg>
-              <span>
-                {isEs
-                  ? "Ocurrió un error al iniciar sesión. Intenta de nuevo."
-                  : "An error occurred while signing in. Please try again."}
-              </span>
+            <div role="alert" className="border border-error/30 bg-error/5 text-error text-sm px-4 py-3 mb-6">
+              {isEs
+                ? "Ocurrió un error al iniciar sesión. Intenta de nuevo."
+                : "An error occurred while signing in. Please try again."}
             </div>
           )}
 
@@ -531,7 +515,7 @@ function LoginForm({ lang }: { lang: string }) {
             <button
               onClick={() => handleOAuthLogin("google")}
               disabled={signingIn !== null}
-              className="btn border border-base-300 bg-base-100 hover:bg-base-200 text-base-content gap-3 h-12"
+              className="flex items-center justify-center gap-3 w-full h-12 text-sm border border-base-content/15 bg-base-100 hover:bg-base-200/50 text-base-content transition-colors disabled:opacity-40"
             >
               {signingIn === "google" ? (
                 <span className="loading loading-spinner loading-sm" />
@@ -571,7 +555,7 @@ function LoginForm({ lang }: { lang: string }) {
             <button
               onClick={() => handleOAuthLogin("apple")}
               disabled={signingIn !== null}
-              className="btn btn-neutral gap-3 h-12"
+              className="flex items-center justify-center gap-3 w-full h-12 text-sm bg-base-content text-base-100 hover:bg-base-content/90 transition-colors disabled:opacity-40"
             >
               {signingIn === "apple" ? (
                 <span className="loading loading-spinner loading-sm" />
@@ -596,7 +580,7 @@ function LoginForm({ lang }: { lang: string }) {
             <button
               onClick={() => handleOAuthLogin("facebook")}
               disabled={signingIn !== null}
-              className="btn bg-[#1877F2] text-white border-[#0d6ae4] hover:bg-[#166FE5] gap-3 h-12"
+              className="flex items-center justify-center gap-3 w-full h-12 text-sm bg-[#1877F2] text-white hover:bg-[#166FE5] transition-colors disabled:opacity-40"
             >
               {signingIn === "facebook" ? (
                 <span className="loading loading-spinner loading-sm" />
@@ -618,31 +602,35 @@ function LoginForm({ lang }: { lang: string }) {
             </button>
           </div>
 
-          <div className="divider text-base-content/30 text-xs my-6">
-            {isEs ? "O" : "OR"}
+          <div className="flex items-center gap-4 my-6">
+            <div className="flex-1 border-t border-base-content/10" />
+            <span className="text-xs text-base-content/30 tracking-widest uppercase">
+              {isEs ? "O" : "OR"}
+            </span>
+            <div className="flex-1 border-t border-base-content/10" />
           </div>
 
           <Link
             href={`/${lang}/shop`}
-            className="btn btn-ghost btn-block text-base-content/60 hover:text-base-content"
+            className="flex items-center justify-center w-full py-3 text-sm tracking-widest uppercase text-base-content/50 hover:text-base-content border border-base-content/10 hover:border-base-content/25 transition-colors"
           >
             {isEs ? "Explorar como invitado" : "Browse as guest"}
           </Link>
 
-          <p className="text-center text-[11px] text-base-content/40 mt-8 leading-relaxed">
+          <p className="text-center text-xs text-base-content/40 mt-8 leading-relaxed">
             {isEs ? (
               <>
                 Al continuar, aceptas nuestros{" "}
                 <Link
                   href={`/${lang}/terms`}
-                  className="link link-hover"
+                  className="underline underline-offset-2 hover:text-base-content transition-colors"
                 >
                   Términos de Servicio
                 </Link>{" "}
                 y{" "}
                 <Link
                   href={`/${lang}/privacy`}
-                  className="link link-hover"
+                  className="underline underline-offset-2 hover:text-base-content transition-colors"
                 >
                   Política de Privacidad
                 </Link>
@@ -653,14 +641,14 @@ function LoginForm({ lang }: { lang: string }) {
                 By continuing, you agree to our{" "}
                 <Link
                   href={`/${lang}/terms`}
-                  className="link link-hover"
+                  className="underline underline-offset-2 hover:text-base-content transition-colors"
                 >
                   Terms of Service
                 </Link>{" "}
                 and{" "}
                 <Link
                   href={`/${lang}/privacy`}
-                  className="link link-hover"
+                  className="underline underline-offset-2 hover:text-base-content transition-colors"
                 >
                   Privacy Policy
                 </Link>
@@ -683,7 +671,7 @@ export default function LoginPage({
     <Suspense
       fallback={
         <div className="min-h-dvh flex items-center justify-center bg-base-100">
-          <span className="loading loading-spinner loading-lg text-primary" />
+          <span className="loading loading-spinner loading-lg" />
         </div>
       }
     >

@@ -1,14 +1,4 @@
 import { InfoPageShell } from "@/components/layouts/info-page-shell";
-import {
-  CheckCircle,
-  ShieldCheck,
-  UserCog,
-  Tag,
-  Truck,
-  Ban,
-  Scale,
-  Mail,
-} from "lucide-react";
 
 export default async function TermsPage({
   params,
@@ -21,7 +11,6 @@ export default async function TermsPage({
   const sections = es
     ? [
         {
-          icon: CheckCircle,
           title: "1. Aceptación de los términos",
           body: (
             <p>
@@ -32,7 +21,6 @@ export default async function TermsPage({
           ),
         },
         {
-          icon: ShieldCheck,
           title: "2. Uso del servicio",
           body: (
             <>
@@ -53,7 +41,6 @@ export default async function TermsPage({
           ),
         },
         {
-          icon: UserCog,
           title: "3. Cuentas de usuario",
           body: (
             <p>
@@ -64,7 +51,6 @@ export default async function TermsPage({
           ),
         },
         {
-          icon: Tag,
           title: "4. Productos y precios",
           body: (
             <p>
@@ -76,7 +62,6 @@ export default async function TermsPage({
           ),
         },
         {
-          icon: Truck,
           title: "5. Pedidos y entregas",
           body: (
             <p>
@@ -88,7 +73,6 @@ export default async function TermsPage({
           ),
         },
         {
-          icon: Ban,
           title: "6. Política de cancelación",
           body: (
             <p>
@@ -100,7 +84,6 @@ export default async function TermsPage({
           ),
         },
         {
-          icon: Scale,
           title: "7. Propiedad intelectual",
           body: (
             <p>
@@ -111,14 +94,13 @@ export default async function TermsPage({
           ),
         },
         {
-          icon: Mail,
           title: "8. Contacto",
           body: (
             <p>
               Para cualquier consulta sobre estos términos, contáctanos en{" "}
               <a
                 href="mailto:hola@magnoliaonce.com"
-                className="text-primary hover:underline font-medium"
+                className="underline underline-offset-2 hover:text-base-content transition-colors"
               >
                 hola@magnoliaonce.com
               </a>
@@ -129,7 +111,6 @@ export default async function TermsPage({
       ]
     : [
         {
-          icon: CheckCircle,
           title: "1. Acceptance of Terms",
           body: (
             <p>
@@ -140,7 +121,6 @@ export default async function TermsPage({
           ),
         },
         {
-          icon: ShieldCheck,
           title: "2. Use of Service",
           body: (
             <>
@@ -160,7 +140,6 @@ export default async function TermsPage({
           ),
         },
         {
-          icon: UserCog,
           title: "3. User Accounts",
           body: (
             <p>
@@ -171,7 +150,6 @@ export default async function TermsPage({
           ),
         },
         {
-          icon: Tag,
           title: "4. Products and Pricing",
           body: (
             <p>
@@ -183,7 +161,6 @@ export default async function TermsPage({
           ),
         },
         {
-          icon: Truck,
           title: "5. Orders and Delivery",
           body: (
             <p>
@@ -195,7 +172,6 @@ export default async function TermsPage({
           ),
         },
         {
-          icon: Ban,
           title: "6. Cancellation Policy",
           body: (
             <p>
@@ -206,7 +182,6 @@ export default async function TermsPage({
           ),
         },
         {
-          icon: Scale,
           title: "7. Intellectual Property",
           body: (
             <p>
@@ -217,14 +192,13 @@ export default async function TermsPage({
           ),
         },
         {
-          icon: Mail,
           title: "8. Contact",
           body: (
             <p>
               For any questions about these terms, contact us at{" "}
               <a
                 href="mailto:hola@magnoliaonce.com"
-                className="text-primary hover:underline font-medium"
+                className="underline underline-offset-2 hover:text-base-content transition-colors"
               >
                 hola@magnoliaonce.com
               </a>
@@ -236,18 +210,16 @@ export default async function TermsPage({
 
   return (
     <InfoPageShell lang={lang} current="terms">
-      {/* Badge */}
-      <span className="inline-block text-[11px] tracking-widest uppercase text-primary/80 font-semibold mb-4">
-        {es ? "Información Legal" : "Legal"}
-      </span>
-
       {/* Title */}
-      <h1 className="text-3xl md:text-4xl font-semibold text-base-content leading-tight">
+      <p className="text-xs tracking-widest uppercase text-base-content/40 mb-3">
+        {es ? "Información Legal" : "Legal"}
+      </p>
+      <h1 className="text-2xl md:text-3xl tracking-widest uppercase leading-tight">
         {es ? "Términos de Servicio" : "Terms of Service"}
       </h1>
 
       {/* Date */}
-      <p className="text-sm text-base-content/40 mt-2 mb-10">
+      <p className="text-xs tracking-widest uppercase text-base-content/40 mt-3 mb-10">
         {es
           ? "Última actualización: 25 de febrero de 2026"
           : "Last updated: February 25, 2026"}
@@ -255,25 +227,19 @@ export default async function TermsPage({
 
       {/* Sections */}
       <div className="space-y-8">
-        {sections.map((section) => {
-          const Icon = section.icon;
-          return (
-            <section
-              key={section.title}
-              className="relative pl-6 border-l-2 border-base-300 hover:border-primary/40 transition-colors"
-            >
-              <div className="flex items-center gap-2.5 mb-3">
-                <Icon className="h-4 w-4 text-primary/60 shrink-0" />
-                <h2 className="text-base font-semibold text-base-content">
-                  {section.title}
-                </h2>
-              </div>
-              <div className="text-sm text-base-content/70 leading-relaxed space-y-3 [&_ul]:list-disc [&_ul]:pl-5 [&_ul]:space-y-1.5 [&_li]:text-base-content/60">
-                {section.body}
-              </div>
-            </section>
-          );
-        })}
+        {sections.map((section) => (
+          <section
+            key={section.title}
+            className="relative pl-6 border-l border-base-content/10"
+          >
+            <h2 className="text-sm tracking-wide uppercase text-base-content mb-3">
+              {section.title}
+            </h2>
+            <div className="text-sm text-base-content/60 leading-relaxed space-y-3 [&_ul]:list-disc [&_ul]:pl-5 [&_ul]:space-y-1.5 [&_li]:text-base-content/50">
+              {section.body}
+            </div>
+          </section>
+        ))}
       </div>
     </InfoPageShell>
   );

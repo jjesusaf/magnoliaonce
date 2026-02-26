@@ -145,18 +145,16 @@ export default async function FaqPage({
 
   return (
     <InfoPageShell lang={lang} current="faq">
-      {/* Badge */}
-      <span className="inline-block text-[11px] tracking-widest uppercase text-primary/80 font-semibold mb-4">
-        {es ? "Ayuda" : "Help"}
-      </span>
-
       {/* Title */}
-      <h1 className="text-3xl md:text-4xl font-semibold text-base-content leading-tight">
+      <p className="text-xs tracking-widest uppercase text-base-content/40 mb-3">
+        {es ? "Ayuda" : "Help"}
+      </p>
+      <h1 className="text-2xl md:text-3xl tracking-widest uppercase leading-tight">
         {es ? "Preguntas Frecuentes" : "Frequently Asked Questions"}
       </h1>
 
       {/* Subtitle */}
-      <p className="text-sm text-base-content/50 mt-2 mb-10 max-w-md">
+      <p className="text-sm text-base-content/50 mt-3 mb-10 max-w-md leading-relaxed">
         {es
           ? "Encuentra respuestas a las preguntas más comunes sobre nuestros servicios."
           : "Find answers to the most common questions about our services."}
@@ -166,27 +164,22 @@ export default async function FaqPage({
       <div className="space-y-10">
         {faqs.map((group) => (
           <div key={group.category}>
-            <h2 className="text-xs tracking-widest uppercase text-base-content/40 font-semibold mb-4 pl-1">
+            <h2 className="text-xs tracking-widest uppercase text-base-content/40 mb-4 pl-1">
               {group.category}
             </h2>
-            <div className="join join-vertical w-full">
+            <div className="divide-y divide-base-content/10 border-y border-base-content/10">
               {group.items.map((item, i) => (
-                <div
-                  key={i}
-                  className="collapse collapse-arrow join-item border border-base-200"
-                >
-                  <input
-                    type="radio"
-                    name={`faq-${group.category}`}
-                    defaultChecked={i === 0}
-                  />
-                  <div className="collapse-title text-sm font-medium text-base-content">
+                <details key={i} className="group" open={i === 0}>
+                  <summary className="flex items-center justify-between cursor-pointer py-4 px-1 text-sm text-base-content hover:text-base-content/70 transition-colors">
                     {item.q}
-                  </div>
-                  <div className="collapse-content text-sm text-base-content/60 leading-relaxed">
+                    <span className="ml-4 shrink-0 text-base-content/30 group-open:rotate-45 transition-transform duration-200 text-lg leading-none">
+                      +
+                    </span>
+                  </summary>
+                  <div className="pb-4 px-1 text-sm text-base-content/60 leading-relaxed">
                     <p>{item.a}</p>
                   </div>
-                </div>
+                </details>
               ))}
             </div>
           </div>
@@ -194,7 +187,7 @@ export default async function FaqPage({
       </div>
 
       {/* CTA */}
-      <div className="mt-12 text-center py-8 border-t border-base-200">
+      <div className="mt-12 text-center py-8 border-t border-base-content/10">
         <p className="text-sm text-base-content/50 mb-4">
           {es
             ? "¿No encontraste lo que buscabas?"
@@ -202,7 +195,7 @@ export default async function FaqPage({
         </p>
         <Link
           href={`/${lang}/contact`}
-          className="btn btn-primary btn-sm tracking-wider uppercase"
+          className="inline-block px-6 py-2.5 text-xs tracking-widest uppercase bg-base-content text-base-100 hover:bg-base-content/90 transition-colors"
         >
           {es ? "Contáctanos" : "Contact Us"}
         </Link>

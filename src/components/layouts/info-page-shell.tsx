@@ -24,14 +24,14 @@ export function InfoPageShell({ lang, current, children }: Props) {
   return (
     <div className="min-h-dvh bg-base-100 flex flex-col">
       {/* Sticky header */}
-      <header className="sticky top-0 z-40 bg-base-100/80 backdrop-blur-xl border-b border-base-200">
+      <header className="sticky top-0 z-40 bg-base-100/80 backdrop-blur-xl border-b border-base-content/10">
         <div className="max-w-3xl mx-auto flex items-center gap-4 px-6 py-3">
           <Link
             href={`/${lang}/shop`}
-            className="btn btn-ghost btn-sm btn-circle"
+            className="p-1.5 hover:opacity-60 transition-opacity"
             aria-label={isEs ? "Volver a la tienda" : "Back to shop"}
           >
-            <ArrowLeft className="h-4 w-4" />
+            <ArrowLeft className="h-4 w-4" strokeWidth={1.5} />
           </Link>
           <div className="logo-stack grid">
             <Image
@@ -58,7 +58,7 @@ export function InfoPageShell({ lang, current, children }: Props) {
       </main>
 
       {/* Footer cross-navigation */}
-      <footer className="border-t border-base-200 mt-auto">
+      <footer className="border-t border-base-content/10 mt-auto">
         <div className="max-w-3xl mx-auto px-6 py-8">
           <nav className="flex flex-wrap justify-center gap-x-8 gap-y-3">
             {links.map((link) => {
@@ -69,13 +69,13 @@ export function InfoPageShell({ lang, current, children }: Props) {
                   key={link.id}
                   href={link.href}
                   aria-current={isCurrent ? "page" : undefined}
-                  className={`flex items-center gap-1.5 text-xs tracking-wider uppercase transition-colors ${
+                  className={`flex items-center gap-1.5 text-xs tracking-widest uppercase transition-colors ${
                     isCurrent
-                      ? "text-primary font-semibold"
+                      ? "text-base-content"
                       : "text-base-content/40 hover:text-base-content/70"
                   }`}
                 >
-                  <Icon className="h-3.5 w-3.5" />
+                  <Icon className="h-3.5 w-3.5" strokeWidth={1.5} />
                   {link.label}
                 </Link>
               );
