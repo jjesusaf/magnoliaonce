@@ -10,6 +10,7 @@ import { ThemeToggle } from "@/components/theme-toggle";
 import { useCart } from "@/lib/cart-context";
 import { useFavorites } from "@/lib/favorites-context";
 import { CartDrawer } from "@/components/shop/cart-drawer";
+import { PromoMarquee } from "@/components/layouts/promo-marquee";
 import { useAuth } from "@/lib/auth-context";
 
 const DRAWER_ID = "shop-drawer";
@@ -263,6 +264,13 @@ export function ShopNavbar({ lang, nav, cartDict, children }: Props) {
             </label>
           </div>
         </div>
+
+        {/* Promo marquee — only for guests */}
+        {!authLoading && !user && (
+          <div className="fixed top-[57px] lg:top-[65px] left-0 right-0 z-30">
+            <PromoMarquee />
+          </div>
+        )}
 
         {/* Page content */}
         {children}
