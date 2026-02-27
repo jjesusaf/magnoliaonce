@@ -130,17 +130,36 @@ export function CartProvider({ children }: { children: ReactNode }) {
   const [lastAdded, setLastAdded] = useState<LastAddedItem | null>(null);
   const toastTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
 
-  // Hydrate from localStorage on mount
+  // Hydrate from localStorage on mount — validate variants still exist
   useEffect(() => {
-    try {
-      const raw = localStorage.getItem(STORAGE_KEY);
-      if (raw) {
+    async function hydrate() {
+      try {
+        const raw = localStorage.getItem(STORAGE_KEY);
+        if (!raw) return;
         const items = JSON.parse(raw) as CartItem[];
-        if (Array.isArray(items)) dispatch({ type: "hydrate", items });
+        if (!Array.isArray(items) || items.length === 0) return;
+
+        // Validate variant IDs still exist in DB
+        const variantIds = items.map((i) => i.variantId);
+        const res = await fetch(
+          `/api/variants/validate?ids=${variantIds.join(",")}`
+        );
+        if (res.ok) {
+          const { validIds } = (await res.json()) as {
+            validIds: string[];
+          };
+          const validSet = new Set(validIds);
+          const validItems = items.filter((i) => validSet.has(i.variantId));
+          dispatch({ type: "hydrate", items: validItems });
+        } else {
+          // API failed — hydrate all and let checkout catch errors
+          dispatch({ type: "hydrate", items });
+        }
+      } catch {
+        // ignore corrupted data
       }
-    } catch {
-      // ignore corrupted data
     }
+    hydrate();
   }, []);
 
   // Persist to localStorage on items change
