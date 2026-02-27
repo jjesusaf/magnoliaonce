@@ -14,86 +14,6 @@ export type Database = {
   }
   magnolia: {
     Tables: {
-      coupons: {
-        Row: {
-          id: string
-          user_id: string
-          code: string
-          discount_percent: number
-          is_redeemed: boolean
-          created_at: string
-          redeemed_at: string | null
-          expires_at: string
-        }
-        Insert: {
-          id?: string
-          user_id: string
-          code: string
-          discount_percent?: number
-          is_redeemed?: boolean
-          created_at?: string
-          redeemed_at?: string | null
-          expires_at?: string
-        }
-        Update: {
-          id?: string
-          user_id?: string
-          code?: string
-          discount_percent?: number
-          is_redeemed?: boolean
-          created_at?: string
-          redeemed_at?: string | null
-          expires_at?: string
-        }
-        Relationships: []
-      }
-      favorites: {
-        Row: {
-          id: string
-          user_id: string
-          product_id: string
-          created_at: string
-        }
-        Insert: {
-          id?: string
-          user_id: string
-          product_id: string
-          created_at?: string
-        }
-        Update: {
-          id?: string
-          user_id?: string
-          product_id?: string
-          created_at?: string
-        }
-        Relationships: [
-          {
-            foreignKeyName: "favorites_product_id_fkey"
-            columns: ["product_id"]
-            isOneToOne: false
-            referencedRelation: "products"
-            referencedColumns: ["id"]
-          },
-        ]
-      }
-      profiles: {
-        Row: {
-          user_id: string
-          is_admin: boolean
-          created_at: string
-        }
-        Insert: {
-          user_id: string
-          is_admin?: boolean
-          created_at?: string
-        }
-        Update: {
-          user_id?: string
-          is_admin?: boolean
-          created_at?: string
-        }
-        Relationships: []
-      }
       categories: {
         Row: {
           created_at: string
@@ -129,6 +49,229 @@ export type Database = {
           sort_order?: number
         }
         Relationships: []
+      }
+      coupons: {
+        Row: {
+          code: string
+          created_at: string
+          discount_percent: number
+          expires_at: string
+          id: string
+          is_redeemed: boolean
+          redeemed_at: string | null
+          user_id: string
+        }
+        Insert: {
+          code: string
+          created_at?: string
+          discount_percent?: number
+          expires_at?: string
+          id?: string
+          is_redeemed?: boolean
+          redeemed_at?: string | null
+          user_id: string
+        }
+        Update: {
+          code?: string
+          created_at?: string
+          discount_percent?: number
+          expires_at?: string
+          id?: string
+          is_redeemed?: boolean
+          redeemed_at?: string | null
+          user_id?: string
+        }
+        Relationships: []
+      }
+      favorites: {
+        Row: {
+          created_at: string
+          id: string
+          product_id: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          product_id: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          product_id?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "favorites_product_id_fkey"
+            columns: ["product_id"]
+            isOneToOne: false
+            referencedRelation: "products"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      order_events: {
+        Row: {
+          id: string
+          order_id: string
+          event_type: string
+          metadata: Json
+          created_at: string
+        }
+        Insert: {
+          id?: string
+          order_id: string
+          event_type: string
+          metadata?: Json
+          created_at?: string
+        }
+        Update: {
+          id?: string
+          order_id?: string
+          event_type?: string
+          metadata?: Json
+          created_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "order_events_order_id_fkey"
+            columns: ["order_id"]
+            isOneToOne: false
+            referencedRelation: "orders"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      order_items: {
+        Row: {
+          id: string
+          image_url: string | null
+          order_id: string
+          product_id: string
+          product_name: string
+          quantity: number
+          unit_price: number
+          variant_id: string
+          variant_label: string
+        }
+        Insert: {
+          id?: string
+          image_url?: string | null
+          order_id: string
+          product_id: string
+          product_name: string
+          quantity: number
+          unit_price: number
+          variant_id: string
+          variant_label: string
+        }
+        Update: {
+          id?: string
+          image_url?: string | null
+          order_id?: string
+          product_id?: string
+          product_name?: string
+          quantity?: number
+          unit_price?: number
+          variant_id?: string
+          variant_label?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "order_items_order_id_fkey"
+            columns: ["order_id"]
+            isOneToOne: false
+            referencedRelation: "orders"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "order_items_product_id_fkey"
+            columns: ["product_id"]
+            isOneToOne: false
+            referencedRelation: "products"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "order_items_variant_id_fkey"
+            columns: ["variant_id"]
+            isOneToOne: false
+            referencedRelation: "product_variants"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      orders: {
+        Row: {
+          coupon_id: string | null
+          created_at: string
+          currency: string
+          discount_amount: number
+          email: string | null
+          external_reference: string
+          id: string
+          lang: string
+          mp_payment_id: string | null
+          mp_preference_id: string | null
+          mp_status: string | null
+          mp_status_detail: string | null
+          status: string
+          subtotal: number
+          tax_amount: number
+          total: number
+          updated_at: string
+          user_id: string | null
+        }
+        Insert: {
+          coupon_id?: string | null
+          created_at?: string
+          currency?: string
+          discount_amount?: number
+          email?: string | null
+          external_reference: string
+          id?: string
+          lang?: string
+          mp_payment_id?: string | null
+          mp_preference_id?: string | null
+          mp_status?: string | null
+          mp_status_detail?: string | null
+          status?: string
+          subtotal: number
+          tax_amount?: number
+          total: number
+          updated_at?: string
+          user_id?: string | null
+        }
+        Update: {
+          coupon_id?: string | null
+          created_at?: string
+          currency?: string
+          discount_amount?: number
+          email?: string | null
+          external_reference?: string
+          id?: string
+          lang?: string
+          mp_payment_id?: string | null
+          mp_preference_id?: string | null
+          mp_status?: string | null
+          mp_status_detail?: string | null
+          status?: string
+          subtotal?: number
+          tax_amount?: number
+          total?: number
+          updated_at?: string
+          user_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "orders_coupon_id_fkey"
+            columns: ["coupon_id"]
+            isOneToOne: false
+            referencedRelation: "coupons"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       product_images: {
         Row: {
@@ -262,12 +405,48 @@ export type Database = {
           },
         ]
       }
+      profiles: {
+        Row: {
+          created_at: string
+          is_admin: boolean
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          is_admin?: boolean
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          is_admin?: boolean
+          user_id?: string
+        }
+        Relationships: []
+      }
+      store_settings: {
+        Row: {
+          key: string
+          value: Json
+          updated_at: string
+        }
+        Insert: {
+          key: string
+          value: Json
+          updated_at?: string
+        }
+        Update: {
+          key?: string
+          value?: Json
+          updated_at?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
     }
     Functions: {
-      [_ in never]: never
+      is_admin: { Args: never; Returns: boolean }
     }
     Enums: {
       [_ in never]: never

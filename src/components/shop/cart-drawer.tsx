@@ -1,6 +1,7 @@
 "use client";
 
 import Image from "next/image";
+import { useRouter } from "next/navigation";
 import { X, Minus, Plus, Trash2 } from "lucide-react";
 import { useCart } from "@/lib/cart-context";
 import { formatPrice } from "@/lib/i18n-helpers";
@@ -22,6 +23,7 @@ type Props = {
 export function CartDrawer({ lang, dict }: Props) {
   const { items, isOpen, closeCart, removeItem, updateQty, totalPrice } =
     useCart();
+  const router = useRouter();
 
   const currency = lang === "es" ? "MXN" : "USD";
   const isEs = lang === "es";
@@ -168,7 +170,13 @@ export function CartDrawer({ lang, dict }: Props) {
                   ? "Impuestos incluidos. Envío calculado al finalizar la compra."
                   : "Duties and taxes included. Shipping is calculated at checkout."}
               </p>
-              <button className="w-full py-3.5 text-sm tracking-widest uppercase bg-base-content text-base-100 hover:bg-base-content/90 transition-colors">
+              <button
+                onClick={() => {
+                  closeCart();
+                  router.push(`/${lang}/checkout`);
+                }}
+                className="w-full py-3.5 text-sm tracking-widest uppercase bg-base-content text-base-100 hover:bg-base-content/90 transition-colors"
+              >
                 {dict.checkout}
               </button>
             </div>
