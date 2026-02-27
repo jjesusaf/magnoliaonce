@@ -60,7 +60,7 @@ export function ShopNavbar({ lang, nav, cartDict, children }: Props) {
   };
 
   const links = [
-    { label: nav.studio, href: `/${lang}/studio`, enabled: false },
+    { label: nav.studio, href: `/${lang}`, enabled: true },
     { label: nav.shop, href: `/${lang}/shop`, enabled: true },
     { label: nav.florals, href: `/${lang}/florals`, enabled: false },
     { label: nav.workshops, href: `/${lang}/workshops`, enabled: false },
