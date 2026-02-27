@@ -1050,6 +1050,12 @@ function AdminContent({ lang }: { lang: string }) {
           <h1 className="text-sm tracking-widest uppercase font-semibold">
             {isEs ? "Productos" : "Products"}
           </h1>
+          <Link
+            href={`/${lang}/admin/orders`}
+            className="btn btn-ghost btn-sm text-xs tracking-widest uppercase"
+          >
+            {isEs ? "Pedidos" : "Orders"}
+          </Link>
           <div className="flex-1" />
           <button onClick={openNew} className="btn btn-primary btn-sm gap-2">
             <Plus className="h-4 w-4" />
