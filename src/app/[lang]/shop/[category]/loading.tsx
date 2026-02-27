@@ -1,24 +1,36 @@
 export default function CategoryLoading() {
   return (
     <main className="pt-16 pb-28 lg:pb-0 flex flex-col min-h-dvh">
-      <section className="flex-1 px-6 py-8 lg:px-16 lg:py-12">
+      {/* Header section — matches px-6 pt-10 pb-6 lg:px-16 lg:pt-14 lg:pb-8 */}
+      <section className="px-6 pt-10 pb-6 lg:px-16 lg:pt-14 lg:pb-8 flex flex-col gap-6">
         {/* Breadcrumbs skeleton */}
-        <div className="flex items-center gap-2 mb-8">
-          <div className="skeleton h-4 w-16"></div>
-          <span className="text-base-content/30">/</span>
-          <div className="skeleton h-4 w-24"></div>
+        <div className="breadcrumbs text-sm">
+          <ul>
+            <li><div className="skeleton h-3.5 w-14" /></li>
+            <li><div className="skeleton h-3.5 w-20" /></li>
+          </ul>
         </div>
 
         {/* Title skeleton */}
-        <div className="skeleton h-8 w-48 mb-8 lg:mb-12"></div>
+        <div className="skeleton h-9 lg:h-10 w-48 lg:w-64" />
 
-        {/* Product grid skeleton */}
-        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 lg:gap-6">
-          {Array.from({ length: 8 }).map((_, i) => (
-            <div key={i} className="flex flex-col gap-3">
-              <div className="skeleton aspect-[3/4] w-full rounded-box"></div>
-              <div className="skeleton h-4 w-3/4"></div>
-              <div className="skeleton h-3 w-1/2"></div>
+        {/* Description skeleton */}
+        <div className="flex flex-col gap-1.5 max-w-3xl">
+          <div className="skeleton h-3.5 w-full" />
+          <div className="skeleton h-3.5 w-3/4" />
+        </div>
+      </section>
+
+      {/* Product grid — matches px-4 pb-8 lg:px-16 lg:pb-12 */}
+      <section className="flex-1 px-4 pb-8 lg:px-16 lg:pb-12">
+        <div className="grid grid-cols-2 md:grid-cols-3 gap-3 md:gap-4">
+          {Array.from({ length: 6 }).map((_, i) => (
+            <div key={i} className="flex flex-col">
+              <div className="skeleton aspect-[3/4] w-full rounded-box" />
+              <div className="p-3 lg:p-4 space-y-2">
+                <div className="skeleton h-3 w-3/4" />
+                <div className="skeleton h-4 w-1/2" />
+              </div>
             </div>
           ))}
         </div>

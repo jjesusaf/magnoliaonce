@@ -9,6 +9,7 @@ import {
   ArrowLeft,
   LogOut,
   Heart,
+  ShoppingBag,
   CircleHelp,
   Shield,
   FileText,
@@ -245,11 +246,50 @@ function LoginForm({ lang }: { lang: string }) {
     }
   }, [user, fetchOrCreateCoupon]);
 
-  // Loading
+  // Loading — profile skeleton
   if (loading) {
     return (
-      <div className="min-h-dvh flex items-center justify-center bg-base-100">
-        <span className="loading loading-spinner loading-lg" />
+      <div className="min-h-dvh bg-base-100 flex flex-col">
+        <header className="sticky top-0 z-40 bg-base-100/80 backdrop-blur-xl border-b border-base-content/10">
+          <div className="max-w-lg mx-auto flex items-center gap-4 px-6 py-3">
+            <div className="p-1.5"><div className="size-4" /></div>
+            <div className="logo-stack grid">
+              <Image src="/images/logo.svg" alt="Magnolia Once" width={120} height={24} className="logo-dark h-5 w-auto" />
+              <Image src="/images/logo-light.svg" alt="Magnolia Once" width={120} height={24} className="logo-light h-5 w-auto" />
+            </div>
+          </div>
+        </header>
+        <div className="max-w-lg w-full mx-auto px-6 pt-10 pb-8">
+          <div className="flex items-center gap-5">
+            <div className="skeleton w-16 h-16 shrink-0" />
+            <div className="flex-1 min-w-0 space-y-2">
+              <div className="skeleton h-3 w-24" />
+              <div className="skeleton h-6 w-36" />
+              <div className="skeleton h-3.5 w-48" />
+            </div>
+          </div>
+        </div>
+        <div className="max-w-lg w-full mx-auto px-6 space-y-2">
+          <div className="flex gap-3">
+            <div className="skeleton h-8 w-36" />
+            <div className="skeleton h-8 w-44" />
+          </div>
+        </div>
+        <div className="max-w-lg w-full mx-auto px-6 mt-6">
+          <div className="skeleton h-40 w-full" />
+        </div>
+        <div className="max-w-lg w-full mx-auto px-6">
+          <div className="border-b border-base-content/10 mt-8 mb-2" />
+          <div className="skeleton h-3 w-24 mt-4 mb-3" />
+          <div className="space-y-1">
+            {Array.from({ length: 5 }).map((_, i) => (
+              <div key={i} className="flex items-center gap-3 py-3 px-1">
+                <div className="skeleton size-4.5" />
+                <div className="skeleton h-3.5 flex-1 max-w-48" />
+              </div>
+            ))}
+          </div>
+        </div>
       </div>
     );
   }
@@ -283,6 +323,11 @@ function LoginForm({ lang }: { lang: string }) {
             },
           ]
         : []),
+      {
+        label: isEs ? "Mis pedidos" : "My orders",
+        href: `/${lang}/orders`,
+        icon: ShoppingBag,
+      },
       {
         label: isEs ? "Mis favoritos" : "My favorites",
         href: `/${lang}/favorites`,
@@ -380,8 +425,15 @@ function LoginForm({ lang }: { lang: string }) {
         {/* Coupon */}
         <div className="max-w-lg w-full mx-auto px-6 mt-6">
           {couponLoading ? (
-            <div className="flex items-center justify-center py-8">
-              <span className="loading loading-dots loading-sm" />
+            <div className="border-2 border-dashed border-base-content/10 p-5 space-y-3">
+              <div className="flex items-center gap-2 mb-1">
+                <div className="skeleton size-4" />
+                <div className="skeleton h-3 w-40" />
+              </div>
+              <div className="skeleton h-7 w-28" />
+              <div className="skeleton h-3 w-36" />
+              <div className="skeleton h-10 w-full mt-4" />
+              <div className="skeleton h-3 w-44 mt-3" />
             </div>
           ) : coupon ? (
             <CouponCard
@@ -670,8 +722,21 @@ export default function LoginPage({
   return (
     <Suspense
       fallback={
-        <div className="min-h-dvh flex items-center justify-center bg-base-100">
-          <span className="loading loading-spinner loading-lg" />
+        <div className="min-h-dvh bg-base-100 flex flex-col items-center justify-center px-6">
+          <div className="w-full max-w-sm space-y-6">
+            <div className="flex justify-center">
+              <div className="skeleton h-8 w-40" />
+            </div>
+            <div className="space-y-2 flex flex-col items-center">
+              <div className="skeleton h-7 w-36" />
+              <div className="skeleton h-3.5 w-56" />
+            </div>
+            <div className="space-y-3 pt-4">
+              <div className="skeleton h-12 w-full" />
+              <div className="skeleton h-12 w-full" />
+              <div className="skeleton h-12 w-full" />
+            </div>
+          </div>
         </div>
       }
     >
