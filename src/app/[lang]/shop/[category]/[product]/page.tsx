@@ -9,7 +9,10 @@ import { getImageUrl } from "@/lib/storage";
 import { ProductGallery } from "@/components/shop/product-gallery";
 import { VariantPicker } from "@/components/shop/variant-picker";
 import { FavoriteButton } from "@/components/shop/favorite-button";
+import { ShareButton } from "@/components/shop/share-button";
+import { TrackViewContent } from "@/components/shop/track-view-content";
 import { ShopFooter } from "@/components/layouts/shop-footer";
+import { currencyForLang } from "@/lib/i18n-helpers";
 
 const BUCKET = "magnolia";
 
@@ -23,9 +26,20 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   if (!product) return {};
   const name = localized(product, "name", lang);
   const description = localized(product, "description", lang);
+  const primaryImage = product.product_images?.find((i) => i.is_primary) ?? product.product_images?.[0];
+  const ogImage = primaryImage
+    ? getImageUrl(BUCKET, primaryImage.storage_path, { width: 1200, height: 630, resize: "cover" })
+    : undefined;
+
   return {
     title: `${name} — Magnolia Once`,
     description: description || undefined,
+    openGraph: {
+      title: `${name} — Magnolia Once`,
+      description: description || undefined,
+      images: ogImage ? [{ url: ogImage, width: 1200, height: 630, alt: name }] : undefined,
+      type: "website",
+    },
   };
 }
 
@@ -53,8 +67,23 @@ export default async function ProductPage({ params }: Props) {
     alt: localized(img, "alt", lang) || productName,
   }));
 
+  const trackCurrency = currencyForLang(lang);
+  const trackVariants = (product.product_variants ?? []).filter((v) => v.currency === trackCurrency);
+  const cheapestVariant = trackVariants.length
+    ? trackVariants.reduce((min, v) => (v.price < min.price ? v : min))
+    : null;
+
   return (
     <main className="pt-16 pb-28 lg:pb-0 flex flex-col min-h-dvh">
+      {cheapestVariant && (
+        <TrackViewContent
+          id={product.id}
+          name={productName}
+          price={cheapestVariant.price}
+          currency={cheapestVariant.currency}
+          category={categoryName}
+        />
+      )}
       <section className="flex-1 px-4 py-8 md:px-8 lg:px-12 lg:py-10">
         {/* Product layout — two columns */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-8 lg:gap-16 max-w-7xl mx-auto">
@@ -87,16 +116,19 @@ export default async function ProductPage({ params }: Props) {
               </ul>
             </div>
 
-            {/* Title + favorite */}
+            {/* Title + actions */}
             <div className="flex items-start justify-between gap-3">
               <h1 className="text-2xl lg:text-3xl tracking-widest uppercase leading-tight">
                 {productName}
               </h1>
-              <FavoriteButton
-                productId={product.id}
-                lang={lang}
-                variant="detail"
-              />
+              <div className="flex items-center shrink-0">
+                <ShareButton productName={productName} lang={lang} />
+                <FavoriteButton
+                  productId={product.id}
+                  lang={lang}
+                  variant="detail"
+                />
+              </div>
             </div>
 
             {/* Description */}

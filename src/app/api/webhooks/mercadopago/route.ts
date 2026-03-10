@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { createHmac } from "crypto";
 import { paymentClient } from "@/lib/mercadopago";
 import { supabaseAdmin, insertOrderEvent } from "@/lib/supabase/admin";
+import { serverTrack } from "@/lib/tracking";
 
 export async function POST(request: NextRequest) {
   try {
@@ -104,7 +105,27 @@ export async function POST(request: NextRequest) {
       }
     }
 
-    // 6. If approved and has coupon, mark coupon as redeemed
+    // 6. Server-side tracking: Purchase (Meta Conversions API)
+    if (orderStatus === "paid" && order) {
+      const { data: orderFull } = await supabaseAdmin
+        .from("orders")
+        .select("email, total, currency, external_reference")
+        .eq("id", order.id)
+        .single();
+
+      if (orderFull) {
+        serverTrack({
+          eventName: "Purchase",
+          eventId: `purchase-${orderFull.external_reference}`,
+          email: orderFull.email ?? undefined,
+          value: orderFull.total,
+          currency: orderFull.currency,
+          contentType: "product",
+        });
+      }
+    }
+
+    // 7. If approved and has coupon, mark coupon as redeemed
     if (orderStatus === "paid" && order?.coupon_id) {
       await supabaseAdmin
         .from("coupons")

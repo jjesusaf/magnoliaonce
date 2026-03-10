@@ -10,6 +10,7 @@ import {
   useRef,
   type ReactNode,
 } from "react";
+import { trackAddToCart } from "@/lib/tracking";
 
 /* ────────────────────────── Types ────────────────────────── */
 
@@ -173,6 +174,14 @@ export function CartProvider({ children }: { children: ReactNode }) {
       setLastAdded({ ...item, addedAt: Date.now() });
       if (toastTimer.current) clearTimeout(toastTimer.current);
       toastTimer.current = setTimeout(() => setLastAdded(null), 3500);
+      trackAddToCart({
+        id: item.variantId,
+        name: item.productName,
+        variant: item.variantLabel,
+        price: item.price,
+        currency: item.currency,
+        quantity: qty ?? 1,
+      });
     },
     [],
   );
