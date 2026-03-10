@@ -64,7 +64,18 @@
     "couponAvailable": "You have a discount coupon",
     "couponUse": "Use",
     "taxLabel": "Tax (16%)",
-    "subtotalBeforeTax": "Subtotal before tax"
+    "subtotalBeforeTax": "Subtotal before tax",
+    "shippingTitle": "Shipping details",
+    "recipientName": "Recipient name",
+    "recipientPhone": "Contact phone",
+    "shippingAddress": "Address (street and number)",
+    "shippingCity": "City",
+    "shippingState": "State",
+    "shippingZip": "Zip code",
+    "shippingNotes": "Delivery instructions (gate code, landmarks...)",
+    "giftMessageLabel": "Gift message or dedication",
+    "giftMessagePlaceholder": "Write a message to accompany your arrangement...",
+    "shippingRequired": "Please complete shipping details"
   },
   "orders": {
     "title": "My orders",
@@ -99,7 +110,13 @@
     "eventReady": "Ready for pickup",
     "eventPhotoAdded": "Arrangement photos",
     "eventDelivered": "Delivered",
-    "photoSection": "Here's your order"
+    "photoSection": "Here's your order",
+    "shippingTitle": "Shipping details",
+    "recipientLabel": "To",
+    "phoneLabel": "Phone",
+    "addressLabel": "Addr.",
+    "notesLabel": "Notes",
+    "giftMessageLabel": "Gift message"
   },
   "adminOrders": {
     "title": "Orders",

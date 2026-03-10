@@ -3,7 +3,7 @@
 import { use, useEffect, useState, useCallback, useRef } from "react";
 import Link from "next/link";
 import Image from "next/image";
-import { ArrowLeft, Package } from "lucide-react";
+import { ArrowLeft, Package, MapPin, Gift } from "lucide-react";
 import { useAuth } from "@/lib/auth-context";
 import { createClient } from "@/lib/supabase/client";
 import { formatPrice } from "@/lib/i18n-helpers";
@@ -29,6 +29,14 @@ type Order = {
   currency: string;
   created_at: string;
   order_items: OrderItem[];
+  recipient_name: string | null;
+  recipient_phone: string | null;
+  shipping_address: string | null;
+  shipping_city: string | null;
+  shipping_state: string | null;
+  shipping_zip: string | null;
+  shipping_notes: string | null;
+  gift_message: string | null;
 };
 
 type OrderEvent = {
@@ -57,6 +65,12 @@ type OrdersDict = {
   eventPhotoAdded: string;
   eventDelivered: string;
   photoSection: string;
+  shippingTitle: string;
+  recipientLabel: string;
+  phoneLabel: string;
+  addressLabel: string;
+  notesLabel: string;
+  giftMessageLabel: string;
 };
 
 const EVENT_LABELS: Record<string, keyof OrdersDict> = {
@@ -175,7 +189,7 @@ function OrderDetailContent({ lang, orderRef }: { lang: string; orderRef: string
     supabase
       .from("orders")
       .select(
-        "id, external_reference, status, subtotal, discount_amount, total, currency, created_at, order_items(id, product_name, variant_label, quantity, unit_price, image_url)"
+        "id, external_reference, status, subtotal, discount_amount, total, currency, created_at, recipient_name, recipient_phone, shipping_address, shipping_city, shipping_state, shipping_zip, shipping_notes, gift_message, order_items(id, product_name, variant_label, quantity, unit_price, image_url)"
       )
       .eq("external_reference", orderRef)
       .single()
@@ -340,6 +354,57 @@ function OrderDetailContent({ lang, orderRef }: { lang: string; orderRef: string
               {dict.timeline}
             </h2>
             <Timeline events={events} dict={dict} lang={lang} />
+          </section>
+        )}
+
+        {/* Shipping info */}
+        {order.recipient_name && (
+          <section className="mb-8">
+            <h2 className="text-[10px] sm:text-xs tracking-widest uppercase text-base-content/40 mb-4 flex items-center gap-1.5">
+              <MapPin className="h-3.5 w-3.5" strokeWidth={1.5} />
+              {dict.shippingTitle}
+            </h2>
+            <div className="border border-base-content/10 px-4 sm:px-5 py-4 space-y-2 text-sm">
+              <div className="flex items-start gap-2">
+                <span className="text-base-content/40 text-xs shrink-0 w-16 pt-0.5">{dict.recipientLabel}</span>
+                <span className="text-base-content">{order.recipient_name}</span>
+              </div>
+              {order.recipient_phone && (
+                <div className="flex items-start gap-2">
+                  <span className="text-base-content/40 text-xs shrink-0 w-16 pt-0.5">{dict.phoneLabel}</span>
+                  <span className="text-base-content">{order.recipient_phone}</span>
+                </div>
+              )}
+              <div className="flex items-start gap-2">
+                <span className="text-base-content/40 text-xs shrink-0 w-16 pt-0.5">{dict.addressLabel}</span>
+                <span className="text-base-content">
+                  {[order.shipping_address, order.shipping_city, order.shipping_state, order.shipping_zip]
+                    .filter(Boolean)
+                    .join(", ")}
+                </span>
+              </div>
+              {order.shipping_notes && (
+                <div className="flex items-start gap-2">
+                  <span className="text-base-content/40 text-xs shrink-0 w-16 pt-0.5">{dict.notesLabel}</span>
+                  <span className="text-base-content/70 italic">{order.shipping_notes}</span>
+                </div>
+              )}
+            </div>
+          </section>
+        )}
+
+        {/* Gift message */}
+        {order.gift_message && (
+          <section className="mb-8">
+            <h2 className="text-[10px] sm:text-xs tracking-widest uppercase text-base-content/40 mb-4 flex items-center gap-1.5">
+              <Gift className="h-3.5 w-3.5" strokeWidth={1.5} />
+              {dict.giftMessageLabel}
+            </h2>
+            <div className="border border-base-content/10 px-4 sm:px-5 py-4">
+              <p className="text-sm text-base-content/80 italic leading-relaxed whitespace-pre-line">
+                &ldquo;{order.gift_message}&rdquo;
+              </p>
+            </div>
           </section>
         )}
 

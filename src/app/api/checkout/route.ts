@@ -3,6 +3,7 @@ import { getSupabase } from "@/lib/supabase";
 import { supabaseAdmin, insertOrderEvent } from "@/lib/supabase/admin";
 import { preferenceClient } from "@/lib/mercadopago";
 import { getImageUrl } from "@/lib/storage";
+import { serverTrack } from "@/lib/tracking";
 
 const BUCKET = "magnolia";
 
@@ -12,12 +13,24 @@ type CartItemPayload = {
   quantity: number;
 };
 
+type ShippingPayload = {
+  recipientName: string;
+  recipientPhone: string;
+  address: string;
+  city: string;
+  state?: string;
+  zip?: string;
+  notes?: string;
+};
+
 type CheckoutBody = {
   items: CartItemPayload[];
   couponCode?: string;
   email?: string;
   lang?: string;
   userId?: string;
+  shipping: ShippingPayload;
+  giftMessage?: string;
 };
 
 function generateRef() {
@@ -33,10 +46,14 @@ function generateRef() {
 export async function POST(request: NextRequest) {
   try {
     const body = (await request.json()) as CheckoutBody;
-    const { items, couponCode, email, lang = "es", userId } = body;
+    const { items, couponCode, email, lang = "es", userId, shipping, giftMessage } = body;
 
     if (!items || items.length === 0) {
       return NextResponse.json({ error: "Cart is empty" }, { status: 400 });
+    }
+
+    if (!shipping?.recipientName || !shipping?.recipientPhone || !shipping?.address || !shipping?.city) {
+      return NextResponse.json({ error: "Shipping details are required" }, { status: 400 });
     }
 
     const supabase = getSupabase();
@@ -197,6 +214,14 @@ export async function POST(request: NextRequest) {
         coupon_id: couponId,
         status: "pending",
         external_reference: externalReference,
+        recipient_name: shipping.recipientName,
+        recipient_phone: shipping.recipientPhone,
+        shipping_address: shipping.address,
+        shipping_city: shipping.city,
+        shipping_state: shipping.state ?? null,
+        shipping_zip: shipping.zip ?? null,
+        shipping_notes: shipping.notes ?? null,
+        gift_message: giftMessage ?? null,
       })
       .select("id")
       .single();
@@ -247,6 +272,19 @@ export async function POST(request: NextRequest) {
       .from("orders")
       .update({ mp_preference_id: preference.id })
       .eq("id", order.id);
+
+    // Server-side tracking: InitiateCheckout
+    serverTrack({
+      eventName: "InitiateCheckout",
+      eventId: externalReference,
+      email: email ?? undefined,
+      value: total,
+      currency: "MXN",
+      contentIds: orderItems.map((oi) => oi.variant_id),
+      contentType: "product",
+      userAgent: request.headers.get("user-agent") ?? undefined,
+      clientIpAddress: request.headers.get("x-forwarded-for") ?? undefined,
+    });
 
     return NextResponse.json({
       preferenceId: preference.id,

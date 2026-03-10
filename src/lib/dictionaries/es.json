@@ -64,7 +64,18 @@
     "couponAvailable": "Tienes un cupon de descuento",
     "couponUse": "Usar",
     "taxLabel": "IVA (16%)",
-    "subtotalBeforeTax": "Subtotal sin IVA"
+    "subtotalBeforeTax": "Subtotal sin IVA",
+    "shippingTitle": "Datos de envio",
+    "recipientName": "Nombre de quien recibe",
+    "recipientPhone": "Telefono de contacto",
+    "shippingAddress": "Direccion (calle y numero)",
+    "shippingCity": "Ciudad",
+    "shippingState": "Estado",
+    "shippingZip": "Codigo postal",
+    "shippingNotes": "Instrucciones de entrega (codigo de acceso, referencias...)",
+    "giftMessageLabel": "Dedicatoria o mensaje personal",
+    "giftMessagePlaceholder": "Escribe un mensaje para acompanar tu arreglo...",
+    "shippingRequired": "Completa los datos de envio"
   },
   "orders": {
     "title": "Mis pedidos",
@@ -99,7 +110,13 @@
     "eventReady": "Listo para entrega",
     "eventPhotoAdded": "Fotos del arreglo",
     "eventDelivered": "Entregado",
-    "photoSection": "Asi quedo tu pedido"
+    "photoSection": "Asi quedo tu pedido",
+    "shippingTitle": "Datos de envio",
+    "recipientLabel": "Recibe",
+    "phoneLabel": "Tel.",
+    "addressLabel": "Dir.",
+    "notesLabel": "Notas",
+    "giftMessageLabel": "Dedicatoria"
   },
   "adminOrders": {
     "title": "Pedidos",

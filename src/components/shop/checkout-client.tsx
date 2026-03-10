@@ -7,7 +7,8 @@ import { initMercadoPago, Payment, StatusScreen } from "@mercadopago/sdk-react";
 import { useCart } from "@/lib/cart-context";
 import { useAuth } from "@/lib/auth-context";
 import { formatPrice } from "@/lib/i18n-helpers";
-import { ShoppingBag, Tag, Loader2, CheckCircle, Clock, XCircle } from "lucide-react";
+import { ShoppingBag, Tag, Loader2, CheckCircle, Clock, XCircle, MapPin, Gift } from "lucide-react";
+import { trackInitiateCheckout, trackPurchase } from "@/lib/tracking";
 
 // Initialize MercadoPago SDK
 if (typeof window !== "undefined") {
@@ -41,6 +42,17 @@ type CheckoutDict = {
   couponUse: string;
   taxLabel: string;
   subtotalBeforeTax: string;
+  shippingTitle: string;
+  recipientName: string;
+  recipientPhone: string;
+  shippingAddress: string;
+  shippingCity: string;
+  shippingState: string;
+  shippingZip: string;
+  shippingNotes: string;
+  giftMessageLabel: string;
+  giftMessagePlaceholder: string;
+  shippingRequired: string;
 };
 
 type Props = {
@@ -63,6 +75,16 @@ export function CheckoutClient({ lang, dict }: Props) {
   const [loading, setLoading] = useState(false);
   const [brickLoading, setBrickLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+
+  // Shipping state
+  const [recipientName, setRecipientName] = useState("");
+  const [recipientPhone, setRecipientPhone] = useState("");
+  const [shippingAddress, setShippingAddress] = useState("");
+  const [shippingCity, setShippingCity] = useState("");
+  const [shippingState, setShippingState] = useState("");
+  const [shippingZip, setShippingZip] = useState("");
+  const [shippingNotes, setShippingNotes] = useState("");
+  const [giftMessage, setGiftMessage] = useState("");
 
   // Payment state
   const [preferenceId, setPreferenceId] = useState<string | null>(null);
@@ -142,9 +164,20 @@ export function CheckoutClient({ lang, dict }: Props) {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [couponCode]);
 
+  const shippingValid =
+    recipientName.trim() &&
+    recipientPhone.trim() &&
+    shippingAddress.trim() &&
+    shippingCity.trim();
+
   const handleContinueToPay = useCallback(async () => {
     if (items.length === 0) return;
     if (!user && !guestEmail.trim()) return;
+
+    if (!recipientName.trim() || !recipientPhone.trim() || !shippingAddress.trim() || !shippingCity.trim()) {
+      setError(dict.shippingRequired);
+      return;
+    }
 
     setLoading(true);
     setError(null);
@@ -163,6 +196,16 @@ export function CheckoutClient({ lang, dict }: Props) {
           email: user?.email || guestEmail || undefined,
           userId: user?.id || undefined,
           lang,
+          shipping: {
+            recipientName: recipientName.trim(),
+            recipientPhone: recipientPhone.trim(),
+            address: shippingAddress.trim(),
+            city: shippingCity.trim(),
+            state: shippingState.trim() || undefined,
+            zip: shippingZip.trim() || undefined,
+            notes: shippingNotes.trim() || undefined,
+          },
+          giftMessage: giftMessage.trim() || undefined,
         }),
       });
 
@@ -187,12 +230,25 @@ export function CheckoutClient({ lang, dict }: Props) {
       setDiscount(subtotal - data.amount);
       setStep("payment");
       setBrickLoading(true);
+
+      trackInitiateCheckout(
+        data.amount,
+        currency,
+        items.map((i) => ({
+          id: i.variantId,
+          name: i.productName,
+          variant: i.variantLabel,
+          price: i.price,
+          currency: i.currency,
+          quantity: i.quantity,
+        }))
+      );
     } catch {
       setError("Connection error");
     } finally {
       setLoading(false);
     }
-  }, [items, user, guestEmail, couponApplied, lang, dict.couponInvalid, subtotal]);
+  }, [items, user, guestEmail, couponApplied, lang, dict.couponInvalid, dict.shippingRequired, subtotal, recipientName, recipientPhone, shippingAddress, shippingCity, shippingState, shippingZip, shippingNotes, giftMessage]);
 
   const handlePaymentSubmit = useCallback(
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -220,13 +276,27 @@ export function CheckoutClient({ lang, dict }: Props) {
         setStep("status");
 
         if (data.status === "approved") {
+          trackPurchase({
+            orderId: externalRef,
+            total: amount,
+            currency,
+            coupon: couponApplied || undefined,
+            items: items.map((i) => ({
+              id: i.variantId,
+              name: i.productName,
+              variant: i.variantLabel,
+              price: i.price,
+              currency: i.currency,
+              quantity: i.quantity,
+            })),
+          });
           clearCart();
         }
       } catch {
         setError("Payment processing error");
       }
     },
-    [externalRef, clearCart]
+    [externalRef, clearCart, amount, currency, couponApplied, items]
   );
 
   // Empty cart state
@@ -489,6 +559,86 @@ export function CheckoutClient({ lang, dict }: Props) {
         )}
       </div>}
 
+      {/* Shipping details */}
+      <div>
+        <h2 className="text-sm tracking-widest uppercase text-base-content/50 mb-4 flex items-center gap-2">
+          <MapPin className="h-4 w-4" strokeWidth={1.5} />
+          {dict.shippingTitle}
+        </h2>
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+          <input
+            type="text"
+            value={recipientName}
+            onChange={(e) => setRecipientName(e.target.value)}
+            placeholder={dict.recipientName}
+            className="col-span-1 sm:col-span-2 px-4 py-3 text-sm bg-base-200/50 border-none outline-none placeholder:text-base-content/30"
+          />
+          <input
+            type="tel"
+            value={recipientPhone}
+            onChange={(e) => setRecipientPhone(e.target.value)}
+            placeholder={dict.recipientPhone}
+            className="px-4 py-3 text-sm bg-base-200/50 border-none outline-none placeholder:text-base-content/30"
+          />
+          <input
+            type="text"
+            value={shippingZip}
+            onChange={(e) => setShippingZip(e.target.value)}
+            placeholder={dict.shippingZip}
+            className="px-4 py-3 text-sm bg-base-200/50 border-none outline-none placeholder:text-base-content/30"
+          />
+          <input
+            type="text"
+            value={shippingAddress}
+            onChange={(e) => setShippingAddress(e.target.value)}
+            placeholder={dict.shippingAddress}
+            className="col-span-1 sm:col-span-2 px-4 py-3 text-sm bg-base-200/50 border-none outline-none placeholder:text-base-content/30"
+          />
+          <input
+            type="text"
+            value={shippingCity}
+            onChange={(e) => setShippingCity(e.target.value)}
+            placeholder={dict.shippingCity}
+            className="px-4 py-3 text-sm bg-base-200/50 border-none outline-none placeholder:text-base-content/30"
+          />
+          <input
+            type="text"
+            value={shippingState}
+            onChange={(e) => setShippingState(e.target.value)}
+            placeholder={dict.shippingState}
+            className="px-4 py-3 text-sm bg-base-200/50 border-none outline-none placeholder:text-base-content/30"
+          />
+          <textarea
+            value={shippingNotes}
+            onChange={(e) => setShippingNotes(e.target.value)}
+            placeholder={dict.shippingNotes}
+            rows={2}
+            className="col-span-1 sm:col-span-2 px-4 py-3 text-sm bg-base-200/50 border-none outline-none placeholder:text-base-content/30 resize-none"
+          />
+        </div>
+      </div>
+
+      {/* Gift message */}
+      <div>
+        <h2 className="text-sm tracking-widest uppercase text-base-content/50 mb-4 flex items-center gap-2">
+          <Gift className="h-4 w-4" strokeWidth={1.5} />
+          {dict.giftMessageLabel}
+        </h2>
+        <textarea
+          value={giftMessage}
+          onChange={(e) => setGiftMessage(e.target.value)}
+          placeholder={dict.giftMessagePlaceholder}
+          rows={3}
+          maxLength={500}
+          className="w-full px-4 py-3 text-sm bg-base-200/50 border-none outline-none placeholder:text-base-content/30 resize-none"
+        />
+        {giftMessage.length > 0 && (
+          <p className="text-xs text-base-content/30 text-right mt-1">
+            {giftMessage.length}/500
+          </p>
+        )}
+      </div>
+
       {/* Totals */}
       <div className="space-y-2.5 py-4 border-t border-base-content/10">
         <div className="flex items-center justify-between">
@@ -535,7 +685,7 @@ export function CheckoutClient({ lang, dict }: Props) {
       {/* Continue button */}
       <button
         onClick={handleContinueToPay}
-        disabled={loading || (items.length === 0) || (!user && !guestEmail.trim())}
+        disabled={loading || (items.length === 0) || (!user && !guestEmail.trim()) || !shippingValid}
         className="w-full py-3.5 text-sm tracking-widest uppercase bg-base-content text-base-100 hover:bg-base-content/90 transition-colors disabled:opacity-40 disabled:cursor-not-allowed flex items-center justify-center gap-2"
       >
         {loading ? (

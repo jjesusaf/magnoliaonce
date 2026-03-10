@@ -210,12 +210,20 @@ export type Database = {
           discount_amount: number
           email: string | null
           external_reference: string
+          gift_message: string | null
           id: string
           lang: string
           mp_payment_id: string | null
           mp_preference_id: string | null
           mp_status: string | null
           mp_status_detail: string | null
+          recipient_name: string | null
+          recipient_phone: string | null
+          shipping_address: string | null
+          shipping_city: string | null
+          shipping_notes: string | null
+          shipping_state: string | null
+          shipping_zip: string | null
           status: string
           subtotal: number
           tax_amount: number
@@ -230,12 +238,20 @@ export type Database = {
           discount_amount?: number
           email?: string | null
           external_reference: string
+          gift_message?: string | null
           id?: string
           lang?: string
           mp_payment_id?: string | null
           mp_preference_id?: string | null
           mp_status?: string | null
           mp_status_detail?: string | null
+          recipient_name?: string | null
+          recipient_phone?: string | null
+          shipping_address?: string | null
+          shipping_city?: string | null
+          shipping_notes?: string | null
+          shipping_state?: string | null
+          shipping_zip?: string | null
           status?: string
           subtotal: number
           tax_amount?: number
@@ -250,12 +266,20 @@ export type Database = {
           discount_amount?: number
           email?: string | null
           external_reference?: string
+          gift_message?: string | null
           id?: string
           lang?: string
           mp_payment_id?: string | null
           mp_preference_id?: string | null
           mp_status?: string | null
           mp_status_detail?: string | null
+          recipient_name?: string | null
+          recipient_phone?: string | null
+          shipping_address?: string | null
+          shipping_city?: string | null
+          shipping_notes?: string | null
+          shipping_state?: string | null
+          shipping_zip?: string | null
           status?: string
           subtotal?: number
           tax_amount?: number
