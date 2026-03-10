@@ -3,12 +3,11 @@
 import { use, useEffect, useState } from "react";
 import Link from "next/link";
 import Image from "next/image";
-import { Heart, ArrowLeft, ShoppingBag, Sparkles, Trash2 } from "lucide-react";
+import { Heart, ArrowLeft, ShoppingBag, Sparkles, X } from "lucide-react";
 import { useAuth } from "@/lib/auth-context";
 import { useFavorites } from "@/lib/favorites-context";
 import { useCart } from "@/lib/cart-context";
 import { createClient } from "@/lib/supabase/client";
-import { FavoriteButton } from "@/components/shop/favorite-button";
 import { getImageUrl } from "@/lib/storage";
 import { localized, formatPrice, currencyForLang } from "@/lib/i18n-helpers";
 
@@ -76,11 +75,14 @@ function FavoritesContent({ lang }: { lang: string }) {
         }
         setLoading(false);
       });
-  }, [user, authLoading, count]);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [user, authLoading]);
 
   const handleRemove = (productId: string) => {
     setRemovingId(productId);
+    // Wait for fade-out animation, then remove from local state and context
     setTimeout(() => {
+      setProducts((prev) => prev.filter((p) => p.id !== productId));
       toggleFavorite(productId);
       setRemovingId(null);
     }, 300);
@@ -284,77 +286,61 @@ function FavoritesContent({ lang }: { lang: string }) {
               return (
                 <div
                   key={product.id}
-                  className={`relative group transition-all duration-300 ${
+                  className={`relative group flex flex-col transition-all duration-300 ${
                     isRemoving ? "opacity-0 scale-95" : "opacity-100 scale-100"
                   }`}
                 >
-                  {/* Card */}
+                  {/* Image with link */}
                   <Link
                     href={`/${lang}/shop/${catSlug}/${product.slug}`}
-                    className="block rounded-box overflow-hidden bg-base-200/50 hover:shadow-lg transition-shadow duration-300"
+                    className="block overflow-hidden bg-base-200 relative aspect-[3/4]"
                   >
-                    {/* Image */}
-                    <div className="aspect-[3/4] w-full overflow-hidden bg-base-200 relative">
-                      {imageUrl && (
-                        <Image
-                          src={imageUrl}
-                          alt={alt}
-                          width={600}
-                          height={800}
-                          className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
-                        />
-                      )}
-                    </div>
+                    {imageUrl && (
+                      <Image
+                        src={imageUrl}
+                        alt={alt}
+                        width={600}
+                        height={800}
+                        className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
+                      />
+                    )}
+                  </Link>
 
-                    {/* Info */}
-                    <div className="p-3 lg:p-4 space-y-1">
-                      <h3 className="text-xs lg:text-sm tracking-widest uppercase text-base-content/80 group-hover:text-base-content transition-colors line-clamp-2">
+                  {/* Remove button — always visible */}
+                  <button
+                    onClick={() => handleRemove(product.id)}
+                    className="absolute top-2 right-2 z-10 btn btn-circle btn-xs bg-base-100/80 backdrop-blur-sm shadow-sm border-0 hover:bg-error/10 transition-colors"
+                    aria-label={isEs ? "Quitar de favoritos" : "Remove from favorites"}
+                  >
+                    <X className="h-3.5 w-3.5 text-base-content/60" />
+                  </button>
+
+                  {/* Info + add to cart */}
+                  <div className="flex items-center gap-2 p-3 lg:p-4">
+                    <Link
+                      href={`/${lang}/shop/${catSlug}/${product.slug}`}
+                      className="flex-1 min-w-0"
+                    >
+                      <h3 className="text-xs lg:text-sm tracking-widest uppercase text-base-content/80 group-hover:text-base-content transition-colors line-clamp-1">
                         {name}
                       </h3>
                       {cheapest && (
-                        <p className="text-sm lg:text-base font-semibold text-base-content">
+                        <p className="text-sm lg:text-base font-semibold text-base-content mt-0.5">
                           {isEs ? "Desde " : "From "}
                           {formatPrice(cheapest.price, cheapest.currency)}
                         </p>
                       )}
-                    </div>
-                  </Link>
-
-                  {/* Action buttons overlay */}
-                  <div className="absolute top-2 right-2 z-10 flex flex-col gap-1">
-                    {/* Favorite (remove) button */}
-                    <button
-                      onClick={(e) => {
-                        e.preventDefault();
-                        e.stopPropagation();
-                        handleRemove(product.id);
-                      }}
-                      className="btn btn-circle btn-sm bg-base-100/80 backdrop-blur-sm shadow-sm border-0 opacity-0 group-hover:opacity-100 transition-opacity"
-                      aria-label={isEs ? "Quitar de favoritos" : "Remove from favorites"}
-                    >
-                      <Trash2 className="h-3.5 w-3.5 text-error/70" />
-                    </button>
+                    </Link>
+                    {cheapest && (
+                      <button
+                        onClick={() => handleAddToCart(product)}
+                        className="btn btn-circle btn-sm bg-base-content text-base-100 border-0 shrink-0 hover:bg-base-content/80 transition-colors"
+                        aria-label={isEs ? "Agregar al carrito" : "Add to cart"}
+                      >
+                        <ShoppingBag className="h-3.5 w-3.5" />
+                      </button>
+                    )}
                   </div>
-
-                  {/* Favorite heart - always visible */}
-                  <div className="absolute top-2 left-2 z-10">
-                    <Heart className="h-4 w-4 fill-red-500 text-red-500 drop-shadow-sm" />
-                  </div>
-
-                  {/* Quick add to cart */}
-                  {cheapest && (
-                    <button
-                      onClick={(e) => {
-                        e.preventDefault();
-                        e.stopPropagation();
-                        handleAddToCart(product);
-                      }}
-                      className="absolute bottom-[4.5rem] lg:bottom-[5.5rem] right-2 z-10 btn btn-circle btn-sm bg-primary text-primary-content shadow-md border-0 opacity-0 group-hover:opacity-100 translate-y-1 group-hover:translate-y-0 transition-all duration-200"
-                      aria-label={isEs ? "Agregar al carrito" : "Add to cart"}
-                    >
-                      <ShoppingBag className="h-3.5 w-3.5" />
-                    </button>
-                  )}
                 </div>
               );
             })}
