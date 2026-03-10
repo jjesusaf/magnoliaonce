@@ -1,8 +1,24 @@
 import { MercadoPagoConfig, Preference, Payment } from "mercadopago";
 
-export const mpClient = new MercadoPagoConfig({
-  accessToken: process.env.MP_ACCESS_TOKEN!,
+let _client: MercadoPagoConfig | null = null;
+
+function getClient() {
+  if (!_client) {
+    _client = new MercadoPagoConfig({
+      accessToken: process.env.MP_ACCESS_TOKEN!,
+    });
+  }
+  return _client;
+}
+
+export const preferenceClient = new Proxy({} as Preference, {
+  get(_, prop) {
+    return (new Preference(getClient()) as unknown as Record<string | symbol, unknown>)[prop];
+  },
 });
 
-export const preferenceClient = new Preference(mpClient);
-export const paymentClient = new Payment(mpClient);
+export const paymentClient = new Proxy({} as Payment, {
+  get(_, prop) {
+    return (new Payment(getClient()) as unknown as Record<string | symbol, unknown>)[prop];
+  },
+});
