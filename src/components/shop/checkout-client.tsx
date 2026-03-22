@@ -9,6 +9,7 @@ import { useAuth } from "@/lib/auth-context";
 import { formatPrice } from "@/lib/i18n-helpers";
 import { ShoppingBag, Tag, Loader2, CheckCircle, Clock, XCircle, MapPin, Gift } from "lucide-react";
 import { trackInitiateCheckout, trackPurchase } from "@/lib/tracking";
+import { AddressAutocomplete } from "@/components/shop/address-autocomplete";
 
 // Initialize MercadoPago SDK
 if (typeof window !== "undefined") {
@@ -587,13 +588,20 @@ export function CheckoutClient({ lang, dict }: Props) {
             placeholder={dict.shippingZip}
             className="px-4 py-3 text-sm bg-base-200/50 border-none outline-none placeholder:text-base-content/30"
           />
-          <input
-            type="text"
-            value={shippingAddress}
-            onChange={(e) => setShippingAddress(e.target.value)}
-            placeholder={dict.shippingAddress}
-            className="col-span-1 sm:col-span-2 px-4 py-3 text-sm bg-base-200/50 border-none outline-none placeholder:text-base-content/30"
-          />
+          <div className="col-span-1 sm:col-span-2">
+            <AddressAutocomplete
+              value={shippingAddress}
+              onChange={setShippingAddress}
+              onSelect={(result) => {
+                setShippingAddress(result.address);
+                if (result.city) setShippingCity(result.city);
+                if (result.state) setShippingState(result.state);
+                if (result.zip) setShippingZip(result.zip);
+              }}
+              placeholder={dict.shippingAddress}
+              className="w-full px-4 py-3 text-sm bg-base-200/50 border-none outline-none placeholder:text-base-content/30"
+            />
+          </div>
           <input
             type="text"
             value={shippingCity}
