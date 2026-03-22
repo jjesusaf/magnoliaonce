@@ -21,7 +21,7 @@ type Props = {
 };
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
-  const { lang, product: slug } = await params;
+  const { lang, category: catSlug, product: slug } = await params;
   const product = await getProductBySlug(slug);
   if (!product) return {};
   const name = localized(product, "name", lang);
@@ -30,6 +30,8 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const ogImage = primaryImage
     ? getImageUrl(BUCKET, primaryImage.storage_path, { width: 1200, height: 630, resize: "cover" })
     : undefined;
+  const siteUrl = process.env.NEXT_PUBLIC_APP_URL ?? "https://magnoliaonce.com";
+  const productPath = `/shop/${catSlug}/${slug}`;
 
   return {
     title: `${name} — Magnolia Once`,
@@ -39,6 +41,13 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
       description: description || undefined,
       images: ogImage ? [{ url: ogImage, width: 1200, height: 630, alt: name }] : undefined,
       type: "website",
+    },
+    alternates: {
+      languages: {
+        es: `${siteUrl}/es${productPath}`,
+        en: `${siteUrl}/en${productPath}`,
+      },
+      canonical: `${siteUrl}/${lang}${productPath}`,
     },
   };
 }
@@ -73,8 +82,31 @@ export default async function ProductPage({ params }: Props) {
     ? trackVariants.reduce((min, v) => (v.price < min.price ? v : min))
     : null;
 
+  // JSON-LD structured data for Google rich results
+  const jsonLd = {
+    "@context": "https://schema.org",
+    "@type": "Product",
+    name: productName,
+    description: description || undefined,
+    image: galleryImages[0]?.url || undefined,
+    brand: { "@type": "Brand", name: "Magnolia Once" },
+    ...(cheapestVariant && {
+      offers: {
+        "@type": "Offer",
+        price: cheapestVariant.price,
+        priceCurrency: cheapestVariant.currency,
+        availability: "https://schema.org/InStock",
+        url: `${process.env.NEXT_PUBLIC_APP_URL ?? "https://magnoliaonce.com"}/${lang}/shop/${catSlug}/${productSlug}`,
+      },
+    }),
+  };
+
   return (
     <main className="pt-16 pb-28 lg:pb-0 flex flex-col min-h-dvh">
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+      />
       {cheapestVariant && (
         <TrackViewContent
           id={product.id}
