@@ -17,8 +17,22 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { lang, category: slug } = await params;
   const cat = await getCategory(slug);
   if (!cat) return {};
+  const name = localized(cat, "name", lang);
+  const description = localized(cat, "description", lang);
+  const siteUrl = process.env.NEXT_PUBLIC_APP_URL ?? "https://magnoliaonce.com";
+
   return {
-    title: localized(cat, "name", lang) + " — Magnolia Once",
+    title: `${name} — Magnolia Once`,
+    description: description || (lang === "es"
+      ? `Explora nuestra colección de ${name.toLowerCase()}. Arreglos florales únicos de Magnolia Once.`
+      : `Explore our ${name.toLowerCase()} collection. Unique floral arrangements by Magnolia Once.`),
+    alternates: {
+      languages: {
+        es: `${siteUrl}/es/shop/${slug}`,
+        en: `${siteUrl}/en/shop/${slug}`,
+      },
+      canonical: `${siteUrl}/${lang}/shop/${slug}`,
+    },
   };
 }
 
@@ -71,7 +85,7 @@ export default async function CategoryPage({ params }: Props) {
 
       {/* Product grid */}
       <section className="flex-1 px-4 pb-8 lg:px-16 lg:pb-12">
-        <div className="grid grid-cols-2 md:grid-cols-3 gap-3 md:gap-4">
+        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3 md:gap-4">
           {products.map((product) => (
             <div key={product.id} className="relative group">
               <ProductCard
