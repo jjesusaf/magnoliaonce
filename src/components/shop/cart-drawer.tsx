@@ -1,5 +1,6 @@
 "use client";
 
+import { useEffect } from "react";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { X, Minus, Plus, Trash2 } from "lucide-react";
@@ -29,22 +30,39 @@ export function CartDrawer({ lang, dict }: Props) {
   const isEs = lang === "es";
   const itemCount = items.reduce((sum, i) => sum + i.quantity, 0);
 
+  // Lock body scroll when cart is open (iOS-safe)
+  useEffect(() => {
+    if (!isOpen) return;
+    const scrollY = window.scrollY;
+    document.body.style.position = "fixed";
+    document.body.style.top = `-${scrollY}px`;
+    document.body.style.left = "0";
+    document.body.style.right = "0";
+    document.body.style.overflow = "hidden";
+
+    return () => {
+      document.body.style.position = "";
+      document.body.style.top = "";
+      document.body.style.left = "";
+      document.body.style.right = "";
+      document.body.style.overflow = "";
+      window.scrollTo(0, scrollY);
+    };
+  }, [isOpen]);
+
+  if (!isOpen) return null;
+
   return (
     <>
       {/* Overlay */}
-      {isOpen && (
-        <div
-          className="fixed inset-0 bg-black/40 z-60 transition-opacity"
-          onClick={closeCart}
-        />
-      )}
+      <div
+        className="fixed inset-0 bg-black/40 z-90"
+        onClick={closeCart}
+      />
 
       {/* Drawer panel */}
-      <div
-        className={`fixed top-0 right-0 h-full w-full sm:w-105 bg-base-100 z-70 shadow-xl flex flex-col transition-transform duration-300 ease-in-out ${
-          isOpen ? "translate-x-0" : "translate-x-full"
-        }`}
-      >
+      <div className="fixed top-0 right-0 h-dvh w-full sm:w-105 bg-base-100 z-90 shadow-xl flex flex-col">
+
         {/* Header */}
         <div className="flex items-center justify-between px-6 h-15 shrink-0">
           <div className="flex items-center gap-3">
@@ -83,7 +101,7 @@ export function CartDrawer({ lang, dict }: Props) {
               <div className="divide-y divide-base-200">
                 {items.map((item) => (
                   <div key={item.variantId} className="flex gap-4 px-6 py-5">
-                    {/* Thumbnail — square like Midi */}
+                    {/* Thumbnail */}
                     <div className="relative w-18 h-18 shrink-0 overflow-hidden bg-base-200">
                       {item.imageUrl ? (
                         <Image

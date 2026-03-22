@@ -51,6 +51,11 @@ export function ShopNavbar({ lang, nav, cartDict, children }: Props) {
   const router = useRouter();
   const drawerRef = useRef<HTMLInputElement>(null);
   const { totalItems, toggleCart } = useCart();
+
+  function handleOpenCart() {
+    window.scrollTo({ top: 0 });
+    toggleCart();
+  }
   const { count: favCount } = useFavorites();
   const { user, loading: authLoading, signOut } = useAuth();
 
@@ -72,6 +77,7 @@ export function ShopNavbar({ lang, nav, cartDict, children }: Props) {
   }
 
   return (
+    <>
     <div className="drawer drawer-end">
       <input
         id={DRAWER_ID}
@@ -251,7 +257,7 @@ export function ShopNavbar({ lang, nav, cartDict, children }: Props) {
             <button
               className="btn btn-ghost btn-circle relative"
               aria-label="Cart"
-              onClick={toggleCart}
+              onClick={handleOpenCart}
             >
               <ShoppingBag className="h-5 w-5 stroke-[1.5]" />
               {totalItems > 0 && (
@@ -381,7 +387,7 @@ export function ShopNavbar({ lang, nav, cartDict, children }: Props) {
                 <button
                   className="btn btn-ghost btn-circle relative"
                   aria-label="Cart"
-                  onClick={() => { closeDrawer(); toggleCart(); }}
+                  onClick={() => { closeDrawer(); handleOpenCart(); }}
                 >
                   <ShoppingBag className="h-5 w-5 stroke-[1.5]" />
                   {totalItems > 0 && (
@@ -406,8 +412,10 @@ export function ShopNavbar({ lang, nav, cartDict, children }: Props) {
         </div>
       </div>
 
-      {/* Cart drawer */}
-      <CartDrawer lang={lang} dict={cartDict} />
     </div>
+
+    {/* Cart drawer — outside the daisyUI drawer to avoid transform breaking fixed positioning */}
+    <CartDrawer lang={lang} dict={cartDict} />
+  </>
   );
 }

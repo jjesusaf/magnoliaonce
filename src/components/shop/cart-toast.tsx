@@ -23,6 +23,7 @@ export function CartToast() {
   }, [lastAdded]);
 
   function handleViewCart() {
+    window.scrollTo({ top: 0 });
     dismissLastAdded();
     toggleCart();
   }
