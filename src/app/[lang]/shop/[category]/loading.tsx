@@ -1,7 +1,7 @@
 export default function CategoryLoading() {
   return (
     <main className="pt-16 pb-28 lg:pb-0 flex flex-col min-h-dvh">
-      {/* Header section — matches px-6 pt-10 pb-6 lg:px-16 lg:pt-14 lg:pb-8 */}
+      {/* Header section */}
       <section className="px-6 pt-10 pb-6 lg:px-16 lg:pt-14 lg:pb-8 flex flex-col gap-6">
         {/* Breadcrumbs skeleton */}
         <div className="breadcrumbs text-sm">
@@ -21,15 +21,15 @@ export default function CategoryLoading() {
         </div>
       </section>
 
-      {/* Product grid — matches px-4 pb-8 lg:px-16 lg:pb-12 */}
+      {/* Product grid */}
       <section className="flex-1 px-4 pb-8 lg:px-16 lg:pb-12">
         <div className="grid grid-cols-2 md:grid-cols-3 gap-3 md:gap-4">
           {Array.from({ length: 6 }).map((_, i) => (
             <div key={i} className="flex flex-col">
-              <div className="skeleton aspect-[3/4] w-full rounded-box" />
+              <div className="skeleton aspect-square w-full" />
               <div className="p-3 lg:p-4 space-y-2">
-                <div className="skeleton h-3 w-3/4" />
-                <div className="skeleton h-4 w-1/2" />
+                <div className="skeleton h-3 w-3/4 mx-auto" />
+                <div className="skeleton h-4 w-1/2 mx-auto" />
               </div>
             </div>
           ))}

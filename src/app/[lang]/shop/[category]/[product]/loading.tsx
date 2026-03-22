@@ -5,10 +5,10 @@ export default function ProductLoading() {
         <div className="grid grid-cols-1 md:grid-cols-2 gap-8 lg:gap-16 max-w-7xl mx-auto">
           {/* Left: Gallery skeleton */}
           <div className="md:sticky md:top-24 md:self-start">
-            <div className="skeleton aspect-4/5 w-full rounded-box" />
-            <div className="flex gap-2 mt-3">
+            <div className="skeleton aspect-square w-full" />
+            <div className="flex gap-px mt-px">
               {Array.from({ length: 4 }).map((_, i) => (
-                <div key={i} className="skeleton w-16 h-20 md:w-20 md:h-25 shrink-0 rounded-box" />
+                <div key={i} className="skeleton w-18 aspect-square shrink-0" />
               ))}
             </div>
           </div>
@@ -23,10 +23,13 @@ export default function ProductLoading() {
               </ul>
             </div>
 
-            {/* Title + favorite button */}
+            {/* Title + actions */}
             <div className="flex items-start justify-between gap-3">
               <div className="skeleton h-8 lg:h-9 w-3/4" />
-              <div className="skeleton size-9 rounded-full shrink-0" />
+              <div className="flex gap-1 shrink-0">
+                <div className="skeleton size-9 rounded-full" />
+                <div className="skeleton size-9 rounded-full" />
+              </div>
             </div>
 
             {/* Description */}
@@ -36,16 +39,16 @@ export default function ProductLoading() {
               <div className="skeleton h-4 w-2/3" />
             </div>
 
-            {/* Variant selector label */}
-            <div className="skeleton h-4 w-44 mt-2" />
-
             {/* Price */}
-            <div className="skeleton h-5 w-16" />
+            <div className="skeleton h-5 w-24" />
+
+            {/* Variant selector label */}
+            <div className="skeleton h-4 w-44" />
 
             {/* Variant buttons */}
             <div className="flex flex-wrap gap-2">
-              {Array.from({ length: 5 }).map((_, i) => (
-                <div key={i} className="skeleton h-10 w-28 rounded-box" />
+              {Array.from({ length: 4 }).map((_, i) => (
+                <div key={i} className="skeleton h-10 w-28" />
               ))}
             </div>
 

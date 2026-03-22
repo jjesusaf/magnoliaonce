@@ -1,12 +1,12 @@
 export default function ShopLoading() {
   return (
-    <main className="pt-16 pb-28 lg:pb-0 min-h-dvh flex flex-col">
-      <section className="flex-1 flex items-center justify-center px-4 py-10 md:px-8 lg:px-20 lg:py-12">
+    <main className="pt-16 pb-28 lg:pb-0 min-h-dvh lg:h-dvh lg:max-h-dvh flex flex-col lg:overflow-hidden">
+      <section className="flex-1 flex items-center justify-center px-4 py-10 md:px-8 lg:px-12 lg:py-4">
         <div className="grid grid-cols-1 md:grid-cols-3 gap-x-8 gap-y-6 w-full">
           {Array.from({ length: 3 }).map((_, i) => (
             <div key={i} className="flex flex-col gap-2">
-              <div className="skeleton aspect-4/5 w-full" />
-              <div className="skeleton h-3.5 w-24" />
+              <div className="skeleton aspect-square w-full" />
+              <div className="skeleton h-3.5 w-24 mx-auto" />
             </div>
           ))}
         </div>

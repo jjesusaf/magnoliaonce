@@ -5,14 +5,17 @@ export default function CheckoutLoading() {
     <div className="min-h-dvh bg-base-100 flex flex-col">
       {/* Sticky header */}
       <header className="sticky top-0 z-40 bg-base-100/80 backdrop-blur-xl border-b border-base-content/10">
-        <div className="max-w-3xl mx-auto flex items-center gap-4 px-6 py-3">
-          <div className="p-1.5">
-            <div className="size-4" />
+        <div className="max-w-3xl mx-auto flex items-center justify-between px-6 py-3">
+          <div className="flex items-center gap-4">
+            <div className="p-1.5">
+              <div className="size-4" />
+            </div>
+            <div className="logo-stack grid">
+              <Image src="/images/logo.svg" alt="Magnolia Once" width={120} height={24} className="logo-dark h-5 w-auto" />
+              <Image src="/images/logo-light.svg" alt="Magnolia Once" width={120} height={24} className="logo-light h-5 w-auto" />
+            </div>
           </div>
-          <div className="logo-stack grid">
-            <Image src="/images/logo.svg" alt="Magnolia Once" width={120} height={24} className="logo-dark h-5 w-auto" />
-            <Image src="/images/logo-light.svg" alt="Magnolia Once" width={120} height={24} className="logo-light h-5 w-auto" />
-          </div>
+          <div className="skeleton size-9 rounded-full" />
         </div>
       </header>
 
@@ -42,6 +45,25 @@ export default function CheckoutLoading() {
         <div className="flex gap-2 mt-8">
           <div className="skeleton h-12 flex-1" />
           <div className="skeleton h-12 w-24" />
+        </div>
+
+        {/* Shipping section */}
+        <div className="mt-8">
+          <div className="skeleton h-3.5 w-36 mb-4" />
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+            <div className="skeleton h-12 col-span-1 sm:col-span-2" />
+            <div className="skeleton h-12" />
+            <div className="skeleton h-12" />
+            <div className="skeleton h-12 col-span-1 sm:col-span-2" />
+            <div className="skeleton h-12" />
+            <div className="skeleton h-12" />
+          </div>
+        </div>
+
+        {/* Gift message */}
+        <div className="mt-8">
+          <div className="skeleton h-3.5 w-40 mb-4" />
+          <div className="skeleton h-24 w-full" />
         </div>
 
         {/* Totals */}
