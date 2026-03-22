@@ -3,7 +3,7 @@
 import Link from "next/link";
 import Image from "next/image";
 import { usePathname, useRouter } from "next/navigation";
-import { User, ShoppingBag, Heart, Menu, LogOut } from "lucide-react";
+import { LogIn, User, ShoppingBag, Heart, Menu, LogOut } from "lucide-react";
 import { useRef } from "react";
 import type { Locale } from "@/lib/i18n";
 import { ThemeToggle } from "@/components/theme-toggle";
@@ -219,7 +219,7 @@ export function ShopNavbar({ lang, nav, cartDict, children }: Props) {
             <Link
               href={`/${lang}/login`}
               className="btn btn-ghost btn-circle"
-              aria-label="Account"
+              aria-label={!authLoading && user ? "Account" : "Sign in"}
             >
               {!authLoading && user ? (
                 <div className="avatar avatar-placeholder">
@@ -235,15 +235,15 @@ export function ShopNavbar({ lang, nav, cartDict, children }: Props) {
                   </div>
                 </div>
               ) : (
-                <User className="h-5 w-5 stroke-[1.5]" />
+                <LogIn className="h-5 w-5 stroke-[1.5]" />
               )}
             </Link>
 
-            {/* Favorites */}
+            {/* Wishlist */}
             <Link
               href={`/${lang}/favorites`}
               className="btn btn-ghost btn-circle relative"
-              aria-label="Favorites"
+              aria-label="Wishlist"
             >
               <Heart className="h-5 w-5 stroke-[1.5]" />
               {favCount > 0 && (
@@ -379,9 +379,9 @@ export function ShopNavbar({ lang, nav, cartDict, children }: Props) {
                     href={`/${lang}/login`}
                     onClick={closeDrawer}
                     className="btn btn-ghost btn-circle"
-                    aria-label="Account"
+                    aria-label="Sign in"
                   >
-                    <User className="h-5 w-5 stroke-[1.5]" />
+                    <LogIn className="h-5 w-5 stroke-[1.5]" />
                   </Link>
                 )}
                 <button
