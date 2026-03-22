@@ -3,6 +3,7 @@ import Image from "next/image";
 import type { Locale } from "@/lib/i18n";
 import { getImageUrl } from "@/lib/storage";
 import { TopControls } from "@/components/top-controls";
+import { TrackedShopLink } from "@/components/tracked-shop-link";
 
 type Dictionary = {
   hero: {
@@ -80,7 +81,14 @@ export function MidiHero({ dict, lang }: Props) {
           <ul className="menu p-0 gap-0">
             {navLinks.map((link) => (
               <li key={link.href}>
-                {link.enabled ? (
+                {link.enabled && link.href.endsWith("/shop") ? (
+                  <TrackedShopLink
+                    href={link.href}
+                    className="link link-hover text-primary-content/60 hover:text-primary-content text-xl md:text-3xl lg:text-4xl uppercase tracking-tight px-0 py-0.5 leading-tight bg-transparent"
+                  >
+                    {link.label}
+                  </TrackedShopLink>
+                ) : link.enabled ? (
                   <Link
                     href={link.href}
                     className="link link-hover text-primary-content/60 hover:text-primary-content text-xl md:text-3xl lg:text-4xl uppercase tracking-tight px-0 py-0.5 leading-tight bg-transparent"

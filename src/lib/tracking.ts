@@ -46,6 +46,15 @@ function gtag(...args: unknown[]) {
   }
 }
 
+/* ── EnterShop: user navigated to shop from home ── */
+export function trackEnterShop() {
+  fbq("trackCustom", "EnterShop");
+
+  gtag("event", "enter_shop", {
+    event_category: "navigation",
+  });
+}
+
 /* ── ViewContent: user viewed a product ── */
 export function trackViewContent(product: ProductData) {
   fbq("track", "ViewContent", {
