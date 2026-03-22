@@ -20,7 +20,9 @@ export type Database = {
           description_en: string | null
           description_es: string | null
           id: string
+          image_height: number | null
           image_path: string | null
+          image_width: number | null
           name_en: string
           name_es: string
           slug: string
@@ -31,7 +33,9 @@ export type Database = {
           description_en?: string | null
           description_es?: string | null
           id?: string
+          image_height?: number | null
           image_path?: string | null
+          image_width?: number | null
           name_en: string
           name_es: string
           slug: string
@@ -42,7 +46,9 @@ export type Database = {
           description_en?: string | null
           description_es?: string | null
           id?: string
+          image_height?: number | null
           image_path?: string | null
+          image_width?: number | null
           name_en?: string
           name_es?: string
           slug?: string
@@ -114,25 +120,25 @@ export type Database = {
       }
       order_events: {
         Row: {
-          id: string
-          order_id: string
-          event_type: string
-          metadata: Json
           created_at: string
+          event_type: string
+          id: string
+          metadata: Json | null
+          order_id: string
         }
         Insert: {
-          id?: string
-          order_id: string
-          event_type: string
-          metadata?: Json
           created_at?: string
+          event_type: string
+          id?: string
+          metadata?: Json | null
+          order_id: string
         }
         Update: {
-          id?: string
-          order_id?: string
-          event_type?: string
-          metadata?: Json
           created_at?: string
+          event_type?: string
+          id?: string
+          metadata?: Json | null
+          order_id?: string
         }
         Relationships: [
           {
@@ -450,18 +456,18 @@ export type Database = {
       store_settings: {
         Row: {
           key: string
-          value: Json
           updated_at: string
+          value: Json
         }
         Insert: {
           key: string
-          value: Json
           updated_at?: string
+          value: Json
         }
         Update: {
           key?: string
-          value?: Json
           updated_at?: string
+          value?: Json
         }
         Relationships: []
       }
