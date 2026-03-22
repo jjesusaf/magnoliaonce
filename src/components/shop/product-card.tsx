@@ -36,7 +36,7 @@ export function ProductCard({ product, categorySlug, lang, fromLabel }: Props) {
       href={`/${lang}/shop/${categorySlug}/${product.slug}`}
       className="group flex flex-col gap-3"
     >
-      <div className="aspect-4/5 w-full overflow-hidden bg-base-200">
+      <div className="aspect-square w-full overflow-hidden bg-base-200">
         {imageUrl && (
           <Image
             src={imageUrl}
