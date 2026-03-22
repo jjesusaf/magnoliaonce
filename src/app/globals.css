@@ -85,6 +85,28 @@ body {
   font-family: "Playfair", serif;
 }
 
+/* Cursor pointer on all interactive elements */
+a,
+button,
+select,
+summary,
+label,
+[role="button"],
+[role="tab"],
+[role="checkbox"],
+[role="radio"],
+[role="switch"],
+[role="link"],
+[role="option"],
+[type="button"],
+[type="submit"],
+[type="reset"],
+input[type="checkbox"],
+input[type="radio"],
+input[type="file"]::file-selector-button {
+  cursor: pointer;
+}
+
 /* Theme-aware logos — grid-stack keeps both in the same cell */
 .logo-stack > * {
   grid-area: 1 / 1;
@@ -106,6 +128,18 @@ body {
 :root[data-theme="magnolia-dark"] .logo-stack .logo-dark {
   opacity: 0;
   visibility: hidden;
+}
+
+/* Page transition — soft fade + deblur */
+.page-enter {
+  opacity: 0;
+  filter: blur(6px);
+}
+.page-enter-active {
+  opacity: 1;
+  filter: blur(0px);
+  transition: opacity 0.5s cubic-bezier(0.25, 0.1, 0.25, 1),
+              filter 0.5s cubic-bezier(0.25, 0.1, 0.25, 1);
 }
 
 /* Promo marquee — infinite scroll */
