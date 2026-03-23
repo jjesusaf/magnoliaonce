@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { paymentClient } from "@/lib/mercadopago";
+import { paymentClient, mapMpStatus } from "@/lib/mercadopago";
 import { supabaseAdmin, insertOrderEvent } from "@/lib/supabase/admin";
 
 export async function POST(request: NextRequest) {
@@ -66,21 +66,5 @@ export async function POST(request: NextRequest) {
       { error: "Payment processing failed" },
       { status: 500 }
     );
-  }
-}
-
-function mapMpStatus(mpStatus: string): string {
-  switch (mpStatus) {
-    case "approved":
-      return "paid";
-    case "in_process":
-    case "pending":
-      return "pending";
-    case "rejected":
-      return "failed";
-    case "cancelled":
-      return "cancelled";
-    default:
-      return "pending";
   }
 }

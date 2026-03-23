@@ -1,8 +1,9 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createHmac } from "crypto";
-import { paymentClient } from "@/lib/mercadopago";
+import { paymentClient, mapMpStatus } from "@/lib/mercadopago";
 import { supabaseAdmin, insertOrderEvent } from "@/lib/supabase/admin";
 import { serverTrack } from "@/lib/tracking";
+import { sendOrderConfirmation } from "@/lib/email";
 
 export async function POST(request: NextRequest) {
   try {
@@ -105,15 +106,16 @@ export async function POST(request: NextRequest) {
       }
     }
 
-    // 6. Server-side tracking: Purchase (Meta Conversions API)
+    // 6. Server-side tracking + confirmation email
     if (orderStatus === "paid" && order) {
       const { data: orderFull } = await supabaseAdmin
         .from("orders")
-        .select("email, total, currency, external_reference")
+        .select("email, lang, total, subtotal, discount_amount, tax_amount, currency, external_reference, recipient_name, shipping_address, shipping_city, shipping_state, shipping_zip, gift_message, order_items(product_name, variant_label, quantity, unit_price, image_url)")
         .eq("id", order.id)
         .single();
 
       if (orderFull) {
+        // Meta Conversions API
         serverTrack({
           eventName: "Purchase",
           eventId: `purchase-${orderFull.external_reference}`,
@@ -122,6 +124,27 @@ export async function POST(request: NextRequest) {
           currency: orderFull.currency,
           contentType: "product",
         });
+
+        // Confirmation email
+        if (orderFull.email) {
+          sendOrderConfirmation({
+            to: orderFull.email,
+            orderRef: orderFull.external_reference,
+            recipientName: orderFull.recipient_name ?? "",
+            items: (orderFull.order_items as { product_name: string; variant_label: string; quantity: number; unit_price: number; image_url: string | null }[]) ?? [],
+            subtotal: orderFull.subtotal,
+            discountAmount: orderFull.discount_amount,
+            taxAmount: orderFull.tax_amount,
+            total: orderFull.total,
+            currency: orderFull.currency,
+            shippingAddress: orderFull.shipping_address ?? "",
+            shippingCity: orderFull.shipping_city ?? "",
+            shippingState: orderFull.shipping_state ?? null,
+            shippingZip: orderFull.shipping_zip ?? null,
+            giftMessage: orderFull.gift_message ?? null,
+            lang: orderFull.lang ?? "es",
+          });
+        }
       }
     }
 
@@ -143,21 +166,5 @@ export async function POST(request: NextRequest) {
       { error: "Webhook processing failed" },
       { status: 500 }
     );
-  }
-}
-
-function mapMpStatus(mpStatus: string): string {
-  switch (mpStatus) {
-    case "approved":
-      return "paid";
-    case "in_process":
-    case "pending":
-      return "pending";
-    case "rejected":
-      return "failed";
-    case "cancelled":
-      return "cancelled";
-    default:
-      return "pending";
   }
 }
