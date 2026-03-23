@@ -34,6 +34,8 @@ type Props = {
   shippingState: string | null;
   shippingZip: string | null;
   giftMessage: string | null;
+  deliveryDate: string | null;
+  deliverySlot: string | null;
   lang: string;
   orderUrl: string;
 };
@@ -58,10 +60,25 @@ export function OrderConfirmationEmail({
   shippingState,
   shippingZip,
   giftMessage,
+  deliveryDate,
+  deliverySlot,
   lang,
   orderUrl,
 }: Props) {
   const isEs = lang === "es";
+
+  const slotLabels: Record<string, string> = {
+    morning: isEs ? "Mañana (9am - 1pm)" : "Morning (9am - 1pm)",
+    afternoon: isEs ? "Tarde (1pm - 5pm)" : "Afternoon (1pm - 5pm)",
+    evening: isEs ? "Noche (5pm - 8pm)" : "Evening (5pm - 8pm)",
+  };
+
+  const formattedDeliveryDate = deliveryDate
+    ? new Date(deliveryDate + "T12:00:00").toLocaleDateString(
+        isEs ? "es-MX" : "en-US",
+        { weekday: "long", day: "numeric", month: "long" }
+      )
+    : null;
 
   return (
     <Html lang={lang}>
@@ -173,6 +190,24 @@ export function OrderConfirmationEmail({
           <Hr style={divider} />
 
           {/* Shipping */}
+          {/* Delivery date */}
+          {formattedDeliveryDate && (
+            <>
+              <Hr style={divider} />
+              <Section>
+                <Text style={sectionTitle}>
+                  {isEs ? "Fecha de entrega" : "Delivery date"}
+                </Text>
+                <Text style={shippingText}>
+                  {formattedDeliveryDate}
+                  {deliverySlot ? ` — ${slotLabels[deliverySlot] ?? deliverySlot}` : ""}
+                </Text>
+              </Section>
+            </>
+          )}
+
+          <Hr style={divider} />
+
           <Section>
             <Text style={sectionTitle}>
               {isEs ? "Datos de envio" : "Shipping details"}

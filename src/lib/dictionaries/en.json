@@ -80,7 +80,14 @@
     "shippingNotes": "Delivery instructions (gate code, landmarks...)",
     "giftMessageLabel": "Gift message or dedication",
     "giftMessagePlaceholder": "Write a message to accompany your arrangement...",
-    "shippingRequired": "Please complete shipping details"
+    "shippingRequired": "Please complete shipping details",
+    "deliveryTitle": "Delivery date & time",
+    "deliveryDate": "Select a date",
+    "deliverySlot": "Delivery time",
+    "slotMorning": "Morning (9am - 1pm)",
+    "slotAfternoon": "Afternoon (1pm - 5pm)",
+    "slotEvening": "Evening (5pm - 8pm)",
+    "deliveryRequired": "Please select delivery date and time"
   },
   "orders": {
     "title": "My orders",

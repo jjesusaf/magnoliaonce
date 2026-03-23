@@ -27,6 +27,8 @@ type OrderEmailData = {
   shippingState: string | null;
   shippingZip: string | null;
   giftMessage: string | null;
+  deliveryDate: string | null;
+  deliverySlot: string | null;
   lang: string;
 };
 

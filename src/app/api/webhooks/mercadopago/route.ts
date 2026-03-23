@@ -110,7 +110,7 @@ export async function POST(request: NextRequest) {
     if (orderStatus === "paid" && order) {
       const { data: orderFull } = await supabaseAdmin
         .from("orders")
-        .select("email, lang, total, subtotal, discount_amount, tax_amount, currency, external_reference, recipient_name, shipping_address, shipping_city, shipping_state, shipping_zip, gift_message, order_items(product_name, variant_label, quantity, unit_price, image_url)")
+        .select("email, lang, total, subtotal, discount_amount, tax_amount, currency, external_reference, recipient_name, shipping_address, shipping_city, shipping_state, shipping_zip, gift_message, delivery_date, delivery_slot, order_items(product_name, variant_label, quantity, unit_price, image_url)")
         .eq("id", order.id)
         .single();
 
@@ -142,6 +142,8 @@ export async function POST(request: NextRequest) {
             shippingState: orderFull.shipping_state ?? null,
             shippingZip: orderFull.shipping_zip ?? null,
             giftMessage: orderFull.gift_message ?? null,
+            deliveryDate: orderFull.delivery_date ?? null,
+            deliverySlot: orderFull.delivery_slot ?? null,
             lang: orderFull.lang ?? "es",
           });
         }

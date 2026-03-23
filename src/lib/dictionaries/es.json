@@ -80,7 +80,14 @@
     "shippingNotes": "Instrucciones de entrega (codigo de acceso, referencias...)",
     "giftMessageLabel": "Dedicatoria o mensaje personal",
     "giftMessagePlaceholder": "Escribe un mensaje para acompanar tu arreglo...",
-    "shippingRequired": "Completa los datos de envio"
+    "shippingRequired": "Completa los datos de envio",
+    "deliveryTitle": "Fecha y hora de entrega",
+    "deliveryDate": "Selecciona una fecha",
+    "deliverySlot": "Horario de entrega",
+    "slotMorning": "Manana (9am - 1pm)",
+    "slotAfternoon": "Tarde (1pm - 5pm)",
+    "slotEvening": "Noche (5pm - 8pm)",
+    "deliveryRequired": "Selecciona fecha y horario de entrega"
   },
   "orders": {
     "title": "Mis pedidos",

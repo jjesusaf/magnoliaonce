@@ -10,6 +10,7 @@ import { formatPrice } from "@/lib/i18n-helpers";
 import { ShoppingBag, Tag, Loader2, CheckCircle, Clock, XCircle, MapPin, Gift } from "lucide-react";
 import { trackInitiateCheckout, trackPurchase } from "@/lib/tracking";
 import { AddressAutocomplete } from "@/components/shop/address-autocomplete";
+import { DeliveryPicker } from "@/components/shop/delivery-picker";
 
 // Initialize MercadoPago SDK
 if (typeof window !== "undefined") {
@@ -54,6 +55,13 @@ type CheckoutDict = {
   giftMessageLabel: string;
   giftMessagePlaceholder: string;
   shippingRequired: string;
+  deliveryTitle: string;
+  deliveryDate: string;
+  deliverySlot: string;
+  slotMorning: string;
+  slotAfternoon: string;
+  slotEvening: string;
+  deliveryRequired: string;
 };
 
 type Props = {
@@ -87,6 +95,8 @@ export function CheckoutClient({ lang, dict }: Props) {
   const [shippingZip, setShippingZip] = useState("");
   const [shippingNotes, setShippingNotes] = useState("");
   const [giftMessage, setGiftMessage] = useState("");
+  const [deliveryDate, setDeliveryDate] = useState("");
+  const [deliverySlot, setDeliverySlot] = useState("");
 
   // Payment state
   const [preferenceId, setPreferenceId] = useState<string | null>(null);
@@ -169,11 +179,14 @@ export function CheckoutClient({ lang, dict }: Props) {
   const phoneDigits = recipientPhone.replace(/\D/g, "");
   const phoneValid = phoneDigits.length >= 10;
 
+  const deliveryValid = deliveryDate && deliverySlot;
+
   const shippingValid =
     recipientName.trim() &&
     phoneValid &&
     shippingAddress.trim() &&
-    shippingCity.trim();
+    shippingCity.trim() &&
+    deliveryValid;
 
   const handleContinueToPay = useCallback(async () => {
     if (items.length === 0) return;
@@ -212,6 +225,8 @@ export function CheckoutClient({ lang, dict }: Props) {
             notes: shippingNotes.trim() || undefined,
           },
           giftMessage: giftMessage.trim() || undefined,
+          deliveryDate: deliveryDate || undefined,
+          deliverySlot: deliverySlot || undefined,
         }),
       });
 
@@ -637,6 +652,16 @@ export function CheckoutClient({ lang, dict }: Props) {
           />
         </div>
       </div>
+
+      {/* Delivery date & time */}
+      <DeliveryPicker
+        date={deliveryDate}
+        slot={deliverySlot}
+        onDateChange={setDeliveryDate}
+        onSlotChange={setDeliverySlot}
+        dict={dict}
+        lang={lang}
+      />
 
       {/* Gift message */}
       <div>

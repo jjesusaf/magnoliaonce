@@ -32,6 +32,8 @@ type CheckoutBody = {
   userId?: string;
   shipping: ShippingPayload;
   giftMessage?: string;
+  deliveryDate?: string;
+  deliverySlot?: string;
 };
 
 function generateRef() {
@@ -47,7 +49,7 @@ function generateRef() {
 export async function POST(request: NextRequest) {
   try {
     const body = (await request.json()) as CheckoutBody;
-    const { idempotencyKey, items, couponCode, email, lang = "es", userId, shipping, giftMessage } = body;
+    const { idempotencyKey, items, couponCode, email, lang = "es", userId, shipping, giftMessage, deliveryDate, deliverySlot } = body;
 
     if (!items || items.length === 0) {
       return NextResponse.json({ error: "Cart is empty" }, { status: 400 });
@@ -245,6 +247,8 @@ export async function POST(request: NextRequest) {
         shipping_zip: shipping.zip ?? null,
         shipping_notes: shipping.notes ?? null,
         gift_message: giftMessage ?? null,
+        delivery_date: deliveryDate ?? null,
+        delivery_slot: deliverySlot ?? null,
       })
       .select("id")
       .single();
