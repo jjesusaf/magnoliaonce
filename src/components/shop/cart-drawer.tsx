@@ -4,7 +4,7 @@ import { useEffect } from "react";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { X, Minus, Plus, Trash2 } from "lucide-react";
-import { useCart } from "@/lib/cart-context";
+import { useCart, MAX_QTY } from "@/lib/cart-context";
 import { formatPrice } from "@/lib/i18n-helpers";
 
 type CartDict = {
@@ -147,7 +147,8 @@ export function CartDrawer({ lang, dict }: Props) {
                             onClick={() =>
                               updateQty(item.variantId, item.quantity + 1)
                             }
-                            className="w-8 h-8 flex items-center justify-center hover:bg-base-200 transition-colors"
+                            disabled={item.quantity >= MAX_QTY}
+                            className="w-8 h-8 flex items-center justify-center hover:bg-base-200 transition-colors disabled:opacity-30 disabled:cursor-not-allowed"
                             aria-label="Increase quantity"
                           >
                             <Plus className="h-3 w-3" />

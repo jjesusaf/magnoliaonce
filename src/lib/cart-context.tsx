@@ -41,6 +41,8 @@ type Action =
   | { type: "close" }
   | { type: "hydrate"; items: CartItem[] };
 
+export const MAX_QTY = 10;
+
 /* ────────────────────────── Reducer ────────────────────────── */
 
 function cartReducer(state: CartState, action: Action): CartState {
@@ -54,7 +56,7 @@ function cartReducer(state: CartState, action: Action): CartState {
           ...state,
           items: state.items.map((i) =>
             i.variantId === action.item.variantId
-              ? { ...i, quantity: i.quantity + (action.qty ?? 1) }
+              ? { ...i, quantity: Math.min(i.quantity + (action.qty ?? 1), MAX_QTY) }
               : i,
           ),
         };
@@ -63,7 +65,7 @@ function cartReducer(state: CartState, action: Action): CartState {
         ...state,
         items: [
           ...state.items,
-          { ...action.item, quantity: action.qty ?? 1 },
+          { ...action.item, quantity: Math.min(action.qty ?? 1, MAX_QTY) },
         ],
       };
     }
@@ -72,8 +74,9 @@ function cartReducer(state: CartState, action: Action): CartState {
         ...state,
         items: state.items.filter((i) => i.variantId !== action.variantId),
       };
-    case "update_qty":
-      if (action.quantity <= 0) {
+    case "update_qty": {
+      const qty = Math.min(action.quantity, MAX_QTY);
+      if (qty <= 0) {
         return {
           ...state,
           items: state.items.filter((i) => i.variantId !== action.variantId),
@@ -83,10 +86,11 @@ function cartReducer(state: CartState, action: Action): CartState {
         ...state,
         items: state.items.map((i) =>
           i.variantId === action.variantId
-            ? { ...i, quantity: action.quantity }
+            ? { ...i, quantity: qty }
             : i,
         ),
       };
+    }
     case "clear":
       return { ...state, items: [] };
     case "toggle":
