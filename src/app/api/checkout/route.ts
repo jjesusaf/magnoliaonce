@@ -24,6 +24,7 @@ type ShippingPayload = {
 };
 
 type CheckoutBody = {
+  idempotencyKey?: string;
   items: CartItemPayload[];
   couponCode?: string;
   email?: string;
@@ -46,10 +47,31 @@ function generateRef() {
 export async function POST(request: NextRequest) {
   try {
     const body = (await request.json()) as CheckoutBody;
-    const { items, couponCode, email, lang = "es", userId, shipping, giftMessage } = body;
+    const { idempotencyKey, items, couponCode, email, lang = "es", userId, shipping, giftMessage } = body;
 
     if (!items || items.length === 0) {
       return NextResponse.json({ error: "Cart is empty" }, { status: 400 });
+    }
+
+    // Idempotency check — return existing order if already created
+    if (idempotencyKey) {
+      const { data: existing } = await supabaseAdmin
+        .from("orders")
+        .select("id, total, subtotal, discount_amount, tax_amount, external_reference, mp_preference_id")
+        .eq("idempotency_key", idempotencyKey)
+        .single();
+
+      if (existing && existing.mp_preference_id) {
+        return NextResponse.json({
+          preferenceId: existing.mp_preference_id,
+          orderId: existing.id,
+          amount: existing.total,
+          subtotal: existing.subtotal,
+          discountAmount: existing.discount_amount,
+          taxAmount: existing.tax_amount,
+          externalReference: existing.external_reference,
+        });
+      }
     }
 
     if (!shipping?.recipientName || !shipping?.recipientPhone || !shipping?.address || !shipping?.city) {
@@ -203,6 +225,7 @@ export async function POST(request: NextRequest) {
     const { data: order, error: orderError } = await supabaseAdmin
       .from("orders")
       .insert({
+        idempotency_key: idempotencyKey ?? null,
         user_id: userId ?? null,
         email: email ?? null,
         lang,
