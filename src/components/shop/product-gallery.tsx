@@ -174,10 +174,13 @@ export function ProductGallery({ images }: Props) {
     <>
       <div className="flex flex-col gap-px">
         {/* Main image — clickable to open lightbox */}
-        <button
+        <div
           onClick={openLightbox}
           className="relative aspect-square w-full overflow-hidden bg-base-200 cursor-zoom-in group/img"
+          role="button"
+          tabIndex={0}
           aria-label="View full image"
+          onKeyDown={(e) => { if (e.key === "Enter" || e.key === " ") openLightbox(); }}
         >
           <Image
             src={main.url}
@@ -190,35 +193,31 @@ export function ProductGallery({ images }: Props) {
           />
           {images.length > 1 && (
             <>
-              <div
+              <button
+                type="button"
                 className="absolute left-3 top-1/2 -translate-y-1/2 z-10 opacity-0 group-hover/img:opacity-100 transition-opacity"
                 onClick={(e) => {
                   e.stopPropagation();
                   goPrev();
                 }}
-                role="button"
-                tabIndex={0}
                 aria-label="Previous image"
-                onKeyDown={() => {}}
               >
                 <ChevronLeft className="h-6 w-6 text-base-content/70" />
-              </div>
-              <div
+              </button>
+              <button
+                type="button"
                 className="absolute right-3 top-1/2 -translate-y-1/2 z-10 opacity-0 group-hover/img:opacity-100 transition-opacity"
                 onClick={(e) => {
                   e.stopPropagation();
                   goNext();
                 }}
-                role="button"
-                tabIndex={0}
                 aria-label="Next image"
-                onKeyDown={() => {}}
               >
                 <ChevronRight className="h-6 w-6 text-base-content/70" />
-              </div>
+              </button>
             </>
           )}
-        </button>
+        </div>
 
         {/* Thumbnail strip */}
         {images.length > 1 && (

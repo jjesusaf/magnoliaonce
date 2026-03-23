@@ -106,13 +106,6 @@ export function MidiHero({ dict, lang }: Props) {
         </nav>
       </div>
 
-      {/* Upload button */}
-      <Link
-        href={`/${lang}/upload`}
-        className="btn btn-sm btn-ghost text-primary-content/30 hover:text-primary-content absolute bottom-4 right-4"
-      >
-        Upload
-      </Link>
     </div>
   );
 }

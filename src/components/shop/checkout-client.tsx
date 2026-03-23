@@ -67,6 +67,7 @@ export function CheckoutClient({ lang, dict }: Props) {
   const { items, totalPrice, clearCart } = useCart();
   const { user } = useAuth();
 
+  const [idempotencyKey] = useState(() => crypto.randomUUID());
   const [step, setStep] = useState<Step>("summary");
   const [couponCode, setCouponCode] = useState("");
   const [couponApplied, setCouponApplied] = useState<string | null>(null);
@@ -165,9 +166,12 @@ export function CheckoutClient({ lang, dict }: Props) {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [couponCode]);
 
+  const phoneDigits = recipientPhone.replace(/\D/g, "");
+  const phoneValid = phoneDigits.length >= 10;
+
   const shippingValid =
     recipientName.trim() &&
-    recipientPhone.trim() &&
+    phoneValid &&
     shippingAddress.trim() &&
     shippingCity.trim();
 
@@ -188,6 +192,7 @@ export function CheckoutClient({ lang, dict }: Props) {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
+          idempotencyKey,
           items: items.map((i) => ({
             productId: i.productId,
             variantId: i.variantId,
@@ -572,13 +577,16 @@ export function CheckoutClient({ lang, dict }: Props) {
             value={recipientName}
             onChange={(e) => setRecipientName(e.target.value)}
             placeholder={dict.recipientName}
+            aria-label={dict.recipientName}
             className="col-span-1 sm:col-span-2 px-4 py-3 text-sm bg-base-200/50 border-none outline-none placeholder:text-base-content/30"
           />
           <input
             type="tel"
             value={recipientPhone}
-            onChange={(e) => setRecipientPhone(e.target.value)}
+            onChange={(e) => setRecipientPhone(e.target.value.replace(/[^\d+\-() ]/g, ""))}
             placeholder={dict.recipientPhone}
+            aria-label={dict.recipientPhone}
+            pattern="[\d\+\-\(\) ]{10,}"
             className="px-4 py-3 text-sm bg-base-200/50 border-none outline-none placeholder:text-base-content/30"
           />
           <input
@@ -586,6 +594,7 @@ export function CheckoutClient({ lang, dict }: Props) {
             value={shippingZip}
             onChange={(e) => setShippingZip(e.target.value)}
             placeholder={dict.shippingZip}
+            aria-label={dict.shippingZip}
             className="px-4 py-3 text-sm bg-base-200/50 border-none outline-none placeholder:text-base-content/30"
           />
           <div className="col-span-1 sm:col-span-2">
@@ -607,6 +616,7 @@ export function CheckoutClient({ lang, dict }: Props) {
             value={shippingCity}
             onChange={(e) => setShippingCity(e.target.value)}
             placeholder={dict.shippingCity}
+            aria-label={dict.shippingCity}
             className="px-4 py-3 text-sm bg-base-200/50 border-none outline-none placeholder:text-base-content/30"
           />
           <input
@@ -614,12 +624,14 @@ export function CheckoutClient({ lang, dict }: Props) {
             value={shippingState}
             onChange={(e) => setShippingState(e.target.value)}
             placeholder={dict.shippingState}
+            aria-label={dict.shippingState}
             className="px-4 py-3 text-sm bg-base-200/50 border-none outline-none placeholder:text-base-content/30"
           />
           <textarea
             value={shippingNotes}
             onChange={(e) => setShippingNotes(e.target.value)}
             placeholder={dict.shippingNotes}
+            aria-label={dict.shippingNotes}
             rows={2}
             className="col-span-1 sm:col-span-2 px-4 py-3 text-sm bg-base-200/50 border-none outline-none placeholder:text-base-content/30 resize-none"
           />
