@@ -14,7 +14,10 @@ type CartDict = {
   total: string;
   checkout: string;
   continueShopping: string;
+  estimatedTotal: string;
+  taxIncluded: string;
 };
+
 
 type Props = {
   lang: string;
@@ -27,7 +30,6 @@ export function CartDrawer({ lang, dict }: Props) {
   const router = useRouter();
 
   const currency = lang === "es" ? "MXN" : "USD";
-  const isEs = lang === "es";
   const itemCount = items.reduce((sum, i) => sum + i.quantity, 0);
 
   // Lock body scroll when cart is open (iOS-safe)
@@ -178,16 +180,14 @@ export function CartDrawer({ lang, dict }: Props) {
             <div className="shrink-0 px-6 py-5 border-t border-base-200 flex flex-col gap-4">
               <div className="flex items-center justify-between">
                 <span className="text-sm tracking-widest uppercase">
-                  {isEs ? "Total estimado" : "Estimated total"}
+                  {dict.estimatedTotal}
                 </span>
                 <span className="text-base">
                   {formatPrice(totalPrice, currency)} {currency}
                 </span>
               </div>
               <p className="text-xs text-base-content/40">
-                {isEs
-                  ? "Impuestos incluidos. Envío calculado al finalizar la compra."
-                  : "Duties and taxes included. Shipping is calculated at checkout."}
+                {dict.taxIncluded}
               </p>
               <button
                 onClick={() => {

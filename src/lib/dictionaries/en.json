@@ -27,7 +27,8 @@
     "soldOut": "Sold out",
     "selectVariant": "Select your arrangement",
     "description": "Description",
-    "backToCollection": "Back to collection"
+    "backToCollection": "Back to collection",
+    "comingSoon": "Coming soon"
   },
   "cart": {
     "title": "Cart",
@@ -36,7 +37,11 @@
     "total": "Total",
     "checkout": "Checkout",
     "added": "Added",
-    "continueShopping": "Continue shopping"
+    "continueShopping": "Continue shopping",
+    "estimatedTotal": "Estimated total",
+    "taxIncluded": "Duties and taxes included. Shipping is calculated at checkout.",
+    "addedToCart": "Added to cart",
+    "viewCart": "View cart"
   },
   "checkout": {
     "title": "Checkout",

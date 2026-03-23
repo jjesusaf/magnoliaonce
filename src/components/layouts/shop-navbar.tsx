@@ -35,6 +35,8 @@ type CartDict = {
   total: string;
   checkout: string;
   continueShopping: string;
+  estimatedTotal: string;
+  taxIncluded: string;
 };
 
 type Props = {

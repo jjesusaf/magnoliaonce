@@ -105,7 +105,7 @@ export default async function CategoryPage({ params }: Props) {
 
         {products.length === 0 && (
           <p className="text-center text-base-content/60 py-16">
-            {lang === "es" ? "Próximamente" : "Coming soon"}
+            {dict.shop.comingSoon}
           </p>
         )}
       </section>

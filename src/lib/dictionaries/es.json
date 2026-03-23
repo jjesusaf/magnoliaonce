@@ -27,7 +27,8 @@
     "soldOut": "Agotado",
     "selectVariant": "Selecciona tu arreglo",
     "description": "Descripción",
-    "backToCollection": "Volver a colección"
+    "backToCollection": "Volver a colección",
+    "comingSoon": "Próximamente"
   },
   "cart": {
     "title": "Carrito",
@@ -36,7 +37,11 @@
     "total": "Total",
     "checkout": "Pagar",
     "added": "Agregado",
-    "continueShopping": "Seguir comprando"
+    "continueShopping": "Seguir comprando",
+    "estimatedTotal": "Total estimado",
+    "taxIncluded": "Impuestos incluidos. Envio calculado al finalizar la compra.",
+    "addedToCart": "Agregado al carrito",
+    "viewCart": "Ver carrito"
   },
   "checkout": {
     "title": "Finalizar compra",
